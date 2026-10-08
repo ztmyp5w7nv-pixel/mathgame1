@@ -1,0 +1,3446 @@
+<!DOCTYPE html>
+<html lang="tr" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Matematik Arcade - 9. Sınıf Maarif Modeli</title>
+  
+  <!-- Favicon & PWA meta -->
+  <meta name="theme-color" content="#f8fafc">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="description" content="9. Sınıf Maarif Modeli Matematik Oyunlaştırılmış Öğrenme ve Arcade Platformu">
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+            accent: {
+              teal: '#0d9488',
+              rose: '#f43f5e',
+              amber: '#f59e0b',
+              purple: '#9333ea',
+              sky: '#0284c7'
+            }
+          },
+          animation: {
+            'bounce-soft': 'bounceSoft 2s infinite',
+            'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 3s ease-in-out infinite',
+            'shake': 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both',
+          },
+          keyframes: {
+            bounceSoft: {
+              '0%, 100%': { transform: 'translateY(-3%)' },
+              '50%': { transform: 'translateY(0)' },
+            },
+            pulseGlow: {
+              '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+              '50%': { opacity: '0.8', transform: 'scale(1.05)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' },
+            },
+            shake: {
+              '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+              '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+              '30%, 50%, 70%': { transform: 'translate3d(-3px, 0, 0)' },
+              '40%, 60%': { transform: 'translate3d(3px, 0, 0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* iOS Momentum Scrolling & Native Feel */
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
+    }
+    
+    /* Custom Glass & Shadows */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 10px 25px -5px rgba(148, 163, 184, 0.15), 0 8px 10px -6px rgba(148, 163, 184, 0.1);
+    }
+
+    .glass-card-subtle {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(226, 232, 240, 0.8);
+      box-shadow: 0 -4px 20px rgba(148, 163, 184, 0.12);
+    }
+
+    /* Hide scrollbars but keep smooth scrolling */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Flashcard 3D perspective */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .card-swipe-transition {
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease;
+    }
+
+    /* Shake animation trigger */
+    .shake-target {
+      animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] text-slate-800 min-h-full font-sans antialiased flex flex-col justify-between">
+
+  <!-- Main Mobile Wrapper (max-w-md for native phone frame simulation) -->
+  <div id="app-container" class="w-full max-w-md mx-auto min-h-screen relative flex flex-col pb-24 shadow-2xl bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0]">
+    
+    <!-- TOP APP BAR -->
+    <header class="sticky top-0 z-40 px-4 pt-3 pb-2.5 glass-card-subtle border-b border-white/60">
+      <div class="flex items-center justify-between">
+        <!-- Logo & Title -->
+        <div class="flex items-center space-x-2.5">
+          <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/25">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-1.5">
+              <span class="font-extrabold text-base tracking-tight text-slate-900">MatArcade</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 tracking-wider">9. SINIF</span>
+            </div>
+            <p class="text-[11px] font-medium text-slate-500 -mt-0.5">2026 Maarif Müfredatı</p>
+          </div>
+        </div>
+
+        <!-- Top Stats Badges (Streak, XP, Sound) -->
+        <div class="flex items-center space-x-1.5">
+          <!-- Streak -->
+          <div id="top-streak-badge" class="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200/80 text-amber-700 text-xs font-bold shadow-sm" title="Günün Serisi">
+            <span>🔥</span>
+            <span id="header-streak-count">1</span>
+          </div>
+
+          <!-- XP Pill -->
+          <div class="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-200/80 text-indigo-700 text-xs font-bold shadow-sm">
+            <span>⚡</span>
+            <span id="header-xp-count">0</span>
+            <span class="text-[10px] text-indigo-500 font-semibold">XP</span>
+          </div>
+
+          <!-- Audio Toggle -->
+          <button id="sound-toggle-btn" class="w-8 h-8 rounded-full bg-white/90 border border-slate-200 flex items-center justify-center text-slate-600 active:scale-90 transition-all shadow-sm" title="Ses Aç/Kapat">
+            <i data-lucide="volume-2" class="w-4 h-4" id="sound-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Level Progress Bar -->
+      <div class="mt-2.5 pt-2 border-t border-slate-200/40 flex items-center justify-between text-xs">
+        <div class="flex items-center space-x-1.5">
+          <span id="header-level-badge" class="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-bold text-[11px]">M1</span>
+          <span id="header-level-title" class="font-semibold text-slate-700 text-[11px]">Sayı Kaşifi</span>
+        </div>
+        <div class="flex-1 max-w-[150px] mx-2 bg-slate-200/80 h-1.5 rounded-full overflow-hidden">
+          <div id="header-level-bar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full w-10 transition-all duration-500"></div>
+        </div>
+        <span id="header-next-xp" class="text-[10px] font-medium text-slate-500">250 XP'ye</span>
+      </div>
+    </header>
+
+    <!-- MAIN VIEW CONTAINER (Dynamic Tab Switching) -->
+    <main id="main-content" class="flex-1 px-4 pt-3 pb-6">
+
+      <!-- ============================================== -->
+      <!-- TAB 1: SEVİYE ÖLÇ (M1 - M6 ADAPTIVE TEST)     -->
+      <!-- ============================================== -->
+      <section id="tab-test" class="tab-view space-y-4">
+        <!-- Hero Banner -->
+        <div class="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 text-white shadow-xl shadow-indigo-600/20">
+          <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+          <div class="absolute right-4 top-4 text-4xl opacity-80 animate-float">🎯</div>
+          <span class="inline-block px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-bold tracking-wide uppercase mb-2">
+            2026 Maarif Seviye Radarı
+          </span>
+          <h2 class="text-xl font-extrabold tracking-tight">Matematik Ligini Keşfet</h2>
+          <p class="text-xs text-indigo-100 mt-1 max-w-[270px] leading-relaxed">
+            Klasik sıkıcı testleri unut! 10 hızlı soruyla analitik refleksini ölç, M1'den M6 Grandmaster'a ligini belirle.
+          </p>
+
+          <div class="mt-4 flex items-center space-x-3">
+            <button id="start-placement-btn" class="px-5 py-2.5 rounded-full bg-white text-indigo-700 font-bold text-xs shadow-lg active:scale-95 transition-all flex items-center space-x-2">
+              <i data-lucide="play" class="w-4 h-4 fill-indigo-700"></i>
+              <span>Teste Başla (3 Dk)</span>
+            </button>
+            <span class="text-[11px] text-indigo-200 font-medium">⚡ Adaptif Algoritma</span>
+          </div>
+        </div>
+
+        <!-- Current Status / Result Card -->
+        <div id="placement-current-status" class="glass-card rounded-3xl p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div id="status-level-avatar" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-600 text-white flex items-center justify-center font-black text-lg shadow-md">
+                M1
+              </div>
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Şu Anki Ligin</span>
+                <h3 id="status-level-name" class="font-extrabold text-slate-800 text-base">Sayı Kaşifi</h3>
+                <p id="status-level-desc" class="text-xs text-slate-500">Temel işlem ve küme refleksi ligi</p>
+              </div>
+            </div>
+            <button id="retest-btn" class="px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-600 text-xs font-bold hover:bg-indigo-100 active:scale-95 transition-all">
+              Yeniden Ölç
+            </button>
+          </div>
+        </div>
+
+        <!-- M1 - M6 League Map (Vertical Accordion/Timeline) -->
+        <div class="glass-card rounded-3xl p-4 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center space-x-1.5">
+              <i data-lucide="layers" class="w-4 h-4 text-indigo-500"></i>
+              <span>M1 - M6 Maarif Ligleri</span>
+            </h4>
+            <span class="text-[10px] text-slate-400 font-medium">CEFR Standardında</span>
+          </div>
+
+          <div class="space-y-2 pt-1" id="league-ladder-list">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 2: ARCADE (7 MİNİ OYUN)                    -->
+      <!-- ============================================== -->
+      <section id="tab-arcade" class="tab-view hidden space-y-4">
+        <!-- Arcade Header -->
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-black text-slate-900 tracking-tight flex items-center space-x-2">
+              <span>🎮 Maarif Arcade Kulübü</span>
+            </h2>
+            <p class="text-xs text-slate-500">Kazanılan her oyun +XP kazandırır, ligini yükseltir!</p>
+          </div>
+          <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-purple-100 text-purple-700">7 Oyun</span>
+        </div>
+
+        <!-- Game Cards Grid -->
+        <div class="grid grid-cols-1 gap-3.5" id="arcade-games-grid">
+          
+          <!-- 1. Mantık Düellosu (Gate Runner) -->
+          <div class="game-card glass-card rounded-3xl p-4 border border-white/80 hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer" onclick="openGame('logic_runner')">
+            <div class="flex items-center space-x-3.5">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-400 to-indigo-600 flex items-center justify-center text-white text-2xl shadow-md shadow-sky-500/20">
+                ⚡
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">Mantık & Önermeler</span>
+                  <span class="text-[11px] font-bold text-amber-500 flex items-center">⭐ +35 XP</span>
+                </div>
+                <h3 class="font-extrabold text-slate-800 text-sm mt-1">Mantık Düellosu (Gate Runner)</h3>
+                <p class="text-xs text-slate-500 line-clamp-1 mt-0.5">1 ∧ 0, p ⇒ q refleks yarışı. Hızlıca 1 veya 0'a bas!</p>
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+              <span>Refleks & Zaman Sayacı</span>
+              <span class="text-indigo-600 font-bold flex items-center space-x-1">
+                <span>Oyna</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <!-- 2. Venn Kesişim Fırlatması (Set Drop) -->
+          <div class="game-card glass-card rounded-3xl p-4 border border-white/80 hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer" onclick="openGame('set_drop')">
+            <div class="flex items-center space-x-3.5">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-400 to-teal-600 flex items-center justify-center text-white text-2xl shadow-md shadow-teal-500/20">
+                🎯
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">Kümeler & Kesişim</span>
+                  <span class="text-[11px] font-bold text-amber-500 flex items-center">⭐ +40 XP</span>
+                </div>
+                <h3 class="font-extrabold text-slate-800 text-sm mt-1">Venn Kesişim Fırlatması</h3>
+                <p class="text-xs text-slate-500 line-clamp-1 mt-0.5">Düşen sayıları A, B veya A ∩ B kesişimine yerleştir.</p>
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+              <span>Venn Şeması Koordinasyonu</span>
+              <span class="text-teal-600 font-bold flex items-center space-x-1">
+                <span>Oyna</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <!-- 3. Denklem Terazisi (Scale Balance) -->
+          <div class="game-card glass-card rounded-3xl p-4 border border-white/80 hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer" onclick="openGame('scale_balance')">
+            <div class="flex items-center space-x-3.5">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-white text-2xl shadow-md shadow-amber-500/20">
+                ⚖️
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">1. Derece Denklemler</span>
+                  <span class="text-[11px] font-bold text-amber-500 flex items-center">⭐ +45 XP</span>
+                </div>
+                <h3 class="font-extrabold text-slate-800 text-sm mt-1">Denklem Terazisi (Scale Balance)</h3>
+                <p class="text-xs text-slate-500 line-clamp-1 mt-0.5">2x + 4 = 14! Kefelere işlem uygulayarak x'i yalnız bırak.</p>
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+              <span>İnteraktif Fizik Terazisi</span>
+              <span class="text-amber-600 font-bold flex items-center space-x-1">
+                <span>Oyna</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <!-- 4. Mutlak Değer Lazer Kalkanı -->
+          <div class="game-card glass-card rounded-3xl p-4 border border-white/80 hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer" onclick="openGame('laser_shield')">
+            <div class="flex items-center space-x-3.5">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-violet-500 to-purple-700 flex items-center justify-center text-white text-2xl shadow-md shadow-purple-500/20">
+                🛡️
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">Mutlak Değer</span>
+                  <span class="text-[11px] font-bold text-amber-500 flex items-center">⭐ +35 XP</span>
+                </div>
+                <h3 class="font-extrabold text-slate-800 text-sm mt-1">Mutlak Değer Lazer Kalkanı</h3>
+                <p class="text-xs text-slate-500 line-clamp-1 mt-0.5">|x| &lt; 4 kalkanı açık! Aralık dışındaki tehditleri lazerle yak.</p>
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+              <span>Sayı Doğrusu Savunması</span>
+              <span class="text-purple-600 font-bold flex items-center space-x-1">
+                <span>Oyna</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <!-- 5. Oran Roketi (Hız & Yakıt) -->
+          <div class="game-card glass-card rounded-3xl p-4 border border-white/80 hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer" onclick="openGame('ratio_rocket')">
+            <div class="flex items-center space-x-3.5">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-600 flex items-center justify-center text-white text-2xl shadow-md shadow-rose-500/20">
+                🚀
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">Oran & Orantı</span>
+                  <span class="text-[11px] font-bold text-amber-500 flex items-center">⭐ +50 XP</span>
+                </div>
+                <h3 class="font-extrabold text-slate-800 text-sm mt-1">Oran Roketi (Hız & Yakıt)</h3>
+                <p class="text-xs text-slate-500 line-clamp-1 mt-0.5">İşçi & Hız problemlerini çöz, yakıtı doldur ve roketi fırlat!</p>
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+              <span>Problem Modelleme</span>
+              <span class="text-rose-600 font-bold flex items-center space-x-1">
+                <span>Oyna</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <!-- 6. Bölünebilme Bombası (Tap Rush) -->
+          <div class="game-card glass-card rounded-3xl p-4 border border-white/80 hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer" onclick="openGame('bomb_rush')">
+            <div class="flex items-center space-x-3.5">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-red-500 to-rose-600 flex items-center justify-center text-white text-2xl shadow-md shadow-red-500/20">
+                💣
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200">Bölünebilme</span>
+                  <span class="text-[11px] font-bold text-amber-500 flex items-center">⭐ +40 XP</span>
+                </div>
+                <h3 class="font-extrabold text-slate-800 text-sm mt-1">Bölünebilme Bombası (Tap Rush)</h3>
+                <p class="text-xs text-slate-500 line-clamp-1 mt-0.5">Saatli bomba tıkır tıkır sayıyor! 3'e bölünenleri hemen patlat.</p>
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+              <span>Hızlı Zihinden Bölme</span>
+              <span class="text-red-600 font-bold flex items-center space-x-1">
+                <span>Oyna</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <!-- 7. Tinder Tarzı Formül Kartları (Swipe Flashcards) -->
+          <div class="game-card glass-card rounded-3xl p-4 border border-white/80 hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer" onclick="openGame('swipe_cards')">
+            <div class="flex items-center space-x-3.5">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-fuchsia-500 to-purple-600 flex items-center justify-center text-white text-2xl shadow-md shadow-purple-500/20">
+                🃏
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-200">Kritik Taktikler</span>
+                  <span class="text-[11px] font-bold text-amber-500 flex items-center">⭐ +30 XP</span>
+                </div>
+                <h3 class="font-extrabold text-slate-800 text-sm mt-1">Swipe Formül Kartları</h3>
+                <p class="text-xs text-slate-500 line-clamp-1 mt-0.5">Sağa kaydır: Biliyorum, Sola kaydır: Tekrar et. Maarif Taktikleri!</p>
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+              <span>Hızlı Hafıza ve Ezber Yok</span>
+              <span class="text-fuchsia-600 font-bold flex items-center space-x-1">
+                <span>Oyna</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 3: BİLGİ KARTLARI (FLASHCARDS DIRECT VIEW)-->
+      <!-- ============================================== -->
+      <section id="tab-cards" class="tab-view hidden space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-black text-slate-900 tracking-tight">🃏 9. Sınıf Maarif Kartları</h2>
+            <p class="text-xs text-slate-500">Sağa kaydır = Bildim (+15 XP), Sola kaydır = Tekrar et</p>
+          </div>
+          <div class="text-right">
+            <span id="flashcard-counter" class="text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-700">1 / 12</span>
+          </div>
+        </div>
+
+        <!-- Flashcard Stack Container -->
+        <div class="relative w-full h-[380px] flex items-center justify-center perspective-1000 mt-2">
+          <div id="flashcard-container" class="relative w-full h-full">
+            <!-- Cards rendered here via JS -->
+          </div>
+        </div>
+
+        <!-- Swipe Action Controls -->
+        <div class="flex items-center justify-center space-x-6 pt-3">
+          <button id="card-swipe-left-btn" class="w-14 h-14 rounded-full bg-white border border-rose-200 text-rose-500 shadow-md active:scale-90 flex items-center justify-center transition-all">
+            <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+          </button>
+          <button id="card-flip-btn" class="px-5 py-2.5 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 active:scale-95 shadow-sm">
+            Kartı Çevir 🔄
+          </button>
+          <button id="card-swipe-right-btn" class="w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/25 active:scale-90 flex items-center justify-center transition-all">
+            <i data-lucide="check" class="w-7 h-7 stroke-[3]"></i>
+          </button>
+        </div>
+
+        <!-- Stats summary -->
+        <div class="glass-card rounded-2xl p-3.5 flex items-center justify-around text-center">
+          <div>
+            <span id="stat-learned-cards" class="font-extrabold text-base text-emerald-600">0</span>
+            <p class="text-[11px] text-slate-400 font-medium">Öğrenilen</p>
+          </div>
+          <div class="w-px h-8 bg-slate-200"></div>
+          <div>
+            <span id="stat-remaining-cards" class="font-extrabold text-base text-indigo-600">12</span>
+            <p class="text-[11px] text-slate-400 font-medium">Kalan Kart</p>
+          </div>
+          <div class="w-px h-8 bg-slate-200"></div>
+          <div>
+            <span id="stat-cards-xp" class="font-extrabold text-base text-amber-500">0</span>
+            <p class="text-[11px] text-slate-400 font-medium">Kazanılan XP</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 4: ROZETLERİM & PROFİL                     -->
+      <!-- ============================================== -->
+      <section id="tab-badges" class="tab-view hidden space-y-4">
+        <!-- User Profile Card -->
+        <div class="glass-card rounded-3xl p-5 text-center relative overflow-hidden">
+          <div class="absolute -right-10 -top-10 w-28 h-28 bg-indigo-100 rounded-full blur-2xl"></div>
+          <div class="relative z-10 flex flex-col items-center">
+            <div id="profile-avatar" class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-3xl font-black text-white shadow-xl shadow-indigo-500/25 border-2 border-white">
+              M1
+            </div>
+            <h3 id="profile-username" class="font-black text-slate-800 text-lg mt-3">Matematik Kaşifi</h3>
+            <p id="profile-level-badge" class="px-3 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold mt-1 border border-indigo-200">
+              M1 Ligi - Sayı Kaşifi
+            </p>
+
+            <!-- Quick Metrics Grid -->
+            <div class="grid grid-cols-3 gap-2 w-full mt-4 pt-4 border-t border-slate-100">
+              <div class="p-2 rounded-2xl bg-slate-50">
+                <span id="prof-xp" class="font-black text-slate-800 text-sm">0</span>
+                <p class="text-[10px] text-slate-400 font-bold uppercase mt-0.5">Toplam XP</p>
+              </div>
+              <div class="p-2 rounded-2xl bg-slate-50">
+                <span id="prof-games" class="font-black text-slate-800 text-sm">0</span>
+                <p class="text-[10px] text-slate-400 font-bold uppercase mt-0.5">Oyun</p>
+              </div>
+              <div class="p-2 rounded-2xl bg-slate-50">
+                <span id="prof-badges" class="font-black text-slate-800 text-sm">0/8</span>
+                <p class="text-[10px] text-slate-400 font-bold uppercase mt-0.5">Rozet</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Badges Collection Grid -->
+        <div class="glass-card rounded-3xl p-4 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center space-x-1.5">
+              <i data-lucide="award" class="w-4 h-4 text-amber-500"></i>
+              <span>Kazanılan Başarı Rozetleri</span>
+            </h4>
+            <span class="text-[11px] font-bold text-indigo-600" id="badge-completion-percent">%0 Tamamlandı</span>
+          </div>
+
+          <div id="badges-grid-container" class="grid grid-cols-2 gap-2.5 pt-1">
+            <!-- Badges rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Reset & Developer Options -->
+        <div class="p-3 text-center">
+          <button id="reset-progress-btn" class="text-xs text-slate-400 hover:text-rose-500 underline transition-colors">
+            İlerlemeyi Sıfırla (Test Amaçlı)
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ============================================== -->
+    <!-- BOTTOM NAVIGATION BAR (FIXED DOCK)             -->
+    <!-- ============================================== -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-40 glass-nav px-3 py-2 flex items-center justify-around">
+      
+      <!-- Tab 1: Seviye Ölç -->
+      <button class="nav-tab-btn flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition-all duration-200 text-indigo-600 font-bold" data-tab="tab-test">
+        <div class="w-6 h-6 flex items-center justify-center">
+          <i data-lucide="crosshair" class="w-5 h-5"></i>
+        </div>
+        <span class="text-[10px] mt-0.5">Seviye Ölç</span>
+      </button>
+
+      <!-- Tab 2: Arcade (7 Oyun) -->
+      <button class="nav-tab-btn flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition-all duration-200 text-slate-400 hover:text-slate-600" data-tab="tab-arcade">
+        <div class="w-6 h-6 flex items-center justify-center">
+          <i data-lucide="gamepad-2" class="w-5 h-5"></i>
+        </div>
+        <span class="text-[10px] mt-0.5">Arcade</span>
+      </button>
+
+      <!-- Tab 3: Bilgi Kartları -->
+      <button class="nav-tab-btn flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition-all duration-200 text-slate-400 hover:text-slate-600" data-tab="tab-cards">
+        <div class="w-6 h-6 flex items-center justify-center">
+          <i data-lucide="layers" class="w-5 h-5"></i>
+        </div>
+        <span class="text-[10px] mt-0.5">Kartlar</span>
+      </button>
+
+      <!-- Tab 4: Rozetlerim -->
+      <button class="nav-tab-btn flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition-all duration-200 text-slate-400 hover:text-slate-600" data-tab="tab-badges">
+        <div class="w-6 h-6 flex items-center justify-center">
+          <i data-lucide="trophy" class="w-5 h-5"></i>
+        </div>
+        <span class="text-[10px] mt-0.5">Rozetler</span>
+      </button>
+
+    </nav>
+
+    <!-- ============================================== -->
+    <!-- MODAL: ADAPTİF SEVİYE TESPİT TESTİ            -->
+    <!-- ============================================== -->
+    <div id="placement-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-3 hidden opacity-0 transition-opacity duration-300">
+      <div class="w-full max-w-sm glass-card rounded-3xl p-5 shadow-2xl flex flex-col max-h-[92vh] overflow-y-auto no-scrollbar relative animate-in fade-in zoom-in-95">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div class="flex items-center space-x-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="test-q-index" class="text-xs font-bold text-slate-500 uppercase tracking-wider">Soru 1 / 10</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <!-- Timer countdown pill -->
+            <div class="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold">
+              <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+              <span id="test-timer">15s</span>
+            </div>
+            <button onclick="closePlacementTest()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Question Body -->
+        <div class="my-4">
+          <div class="flex items-center space-x-2 mb-2">
+            <span id="test-topic-tag" class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[10px] font-bold">Önermeler</span>
+            <span id="test-diff-tag" class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">Zorluk: M2</span>
+          </div>
+
+          <!-- Question Content Box -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-center my-3 min-h-[100px] flex flex-col items-center justify-center">
+            <h4 id="test-question-text" class="text-base font-bold text-slate-800 font-mono tracking-tight leading-snug">
+              p ≡ 1 ve q ≡ 0 ise, (p ∧ q')' doğruluk değeri nedir?
+            </h4>
+            <p id="test-question-hint" class="text-[11px] text-slate-400 mt-2 italic"></p>
+          </div>
+
+          <!-- Answer Options Grid (Fast touch buttons) -->
+          <div id="test-options-container" class="grid grid-cols-2 gap-2.5 pt-1">
+            <!-- Options rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Progress meter -->
+        <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mt-auto">
+          <div id="test-progress-bar" class="bg-gradient-to-r from-indigo-500 to-purple-600 h-full w-0 transition-all duration-300"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- MODAL: INSTAGRAM STORY SEVİYE KARNESİ          -->
+    <!-- ============================================== -->
+    <div id="story-report-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-3 hidden opacity-0 transition-opacity duration-300">
+      <div class="w-full max-w-[340px] rounded-3xl p-6 bg-gradient-to-br from-indigo-600 via-purple-700 to-pink-600 text-white shadow-2xl flex flex-col relative overflow-hidden border-2 border-white/30 animate-in zoom-in-95">
+        
+        <!-- Story ambient decorative blobs -->
+        <div class="absolute -top-12 -right-12 w-40 h-40 bg-pink-400/30 rounded-full blur-2xl"></div>
+        <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-indigo-400/30 rounded-full blur-2xl"></div>
+
+        <!-- Story Header -->
+        <div class="relative z-10 flex items-center justify-between pb-3 border-b border-white/20">
+          <div class="flex items-center space-x-2">
+            <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+            <span class="text-[11px] font-extrabold uppercase tracking-widest text-indigo-100">MAARİF KARNESİ</span>
+          </div>
+          <span class="text-[11px] font-bold text-white/80">#9SinifMatematik</span>
+        </div>
+
+        <!-- Story Content -->
+        <div class="relative z-10 py-5 text-center flex flex-col items-center">
+          <div class="w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-lg border-2 border-white/40 flex items-center justify-center text-4xl shadow-xl shadow-purple-900/30 mb-3 animate-bounce-soft">
+            🏆
+          </div>
+
+          <span class="text-xs font-bold text-pink-200 uppercase tracking-widest">Resmi Seviyen Belirlendi</span>
+          <h2 id="story-level-title" class="text-2xl font-black tracking-tight mt-0.5">M4 - ORAN MİMARI</h2>
+          <span id="story-badge-pill" class="mt-1 px-3 py-0.5 rounded-full bg-white/25 text-white text-xs font-extrabold border border-white/40">
+            Problem & Modelleme Ustası
+          </span>
+
+          <!-- Fun Personalized AI Quote -->
+          <div class="mt-4 p-3 rounded-2xl bg-black/20 backdrop-blur-sm border border-white/20 text-xs text-white/90 leading-relaxed italic text-left">
+            <span class="font-bold text-amber-300 not-italic block mb-0.5">🎯 Maarif Analizi:</span>
+            <p id="story-feedback-quote">"Hızın müthiş! Denklem çözümlerinde roket gibisin ama mantık bağlaçlarında dikkatin dağıldı. Arcade modunda M5 ligine tırmanabilirsin!"</p>
+          </div>
+
+          <!-- Mini Metrics -->
+          <div class="grid grid-cols-3 gap-2 w-full mt-4 text-center">
+            <div class="p-2 rounded-xl bg-white/10 backdrop-blur-sm">
+              <span id="story-accuracy" class="font-extrabold text-sm block">8/10</span>
+              <span class="text-[9px] text-white/70 uppercase font-bold">Doğruluk</span>
+            </div>
+            <div class="p-2 rounded-xl bg-white/10 backdrop-blur-sm">
+              <span id="story-avg-time" class="font-extrabold text-sm block">4.2s</span>
+              <span class="text-[9px] text-white/70 uppercase font-bold">Ort. Hız</span>
+            </div>
+            <div class="p-2 rounded-xl bg-white/10 backdrop-blur-sm">
+              <span id="story-xp-gained" class="font-extrabold text-sm block text-amber-300">+250</span>
+              <span class="text-[9px] text-white/70 uppercase font-bold">XP Kazanç</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Story Action Buttons -->
+        <div class="relative z-10 pt-2 flex flex-col space-y-2">
+          <button id="story-share-btn" class="w-full py-2.5 rounded-full bg-white text-indigo-700 font-extrabold text-xs shadow-lg active:scale-95 transition-all flex items-center justify-center space-x-2">
+            <i data-lucide="share-2" class="w-4 h-4"></i>
+            <span>Sonucu Paylaş (Story Yap)</span>
+          </button>
+          <button onclick="closeStoryReport()" class="w-full py-2 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold text-xs active:scale-95 transition-all">
+            Arcade Oyunlarına Geç 🎮
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- MODAL: OYUN ÇERÇEVESİ (ARCADE GAME ARENA)      -->
+    <!-- ============================================== -->
+    <div id="game-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-md flex items-center justify-center p-3 hidden opacity-0 transition-opacity duration-300">
+      <div class="w-full max-w-sm glass-card rounded-3xl p-4 shadow-2xl flex flex-col h-[600px] max-h-[92vh] overflow-hidden relative">
+        
+        <!-- Game Arena Header -->
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div class="flex items-center space-x-2">
+            <span id="arena-game-icon" class="text-xl">⚡</span>
+            <div>
+              <h3 id="arena-game-title" class="font-extrabold text-slate-800 text-sm">Mantık Düellosu</h3>
+              <span id="arena-game-score" class="text-[11px] font-bold text-indigo-600">Skor: 0 • Seri: x1</span>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div id="arena-timer-pill" class="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold border border-amber-200">
+              <i data-lucide="timer" class="w-3.5 h-3.5"></i>
+              <span id="arena-timer">30s</span>
+            </div>
+            <button onclick="closeGameArena()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Game Stage Area -->
+        <div id="game-stage" class="flex-1 overflow-y-auto no-scrollbar py-2 flex flex-col items-center justify-center relative">
+          <!-- Game content dynamically loaded here -->
+        </div>
+
+        <!-- Game Arena Footer / Controls -->
+        <div id="game-arena-footer" class="pt-2 border-t border-slate-100">
+          <!-- Game specific footer controls injected here -->
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT APPLICATION CODE -->
+  <script>
+    /* ==============================================================
+       1. SOUND EFFECTS SYNTHESIZER (Web Audio API - 100% Offline)
+       ============================================================== */
+    const SoundEngine = {
+      ctx: null,
+      enabled: true,
+
+      init() {
+        if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioCtx();
+        }
+      },
+
+      toggle() {
+        this.enabled = !this.enabled;
+        const icon = document.getElementById('sound-icon');
+        if (icon) {
+          icon.setAttribute('data-lucide', this.enabled ? 'volume-2' : 'volume-x');
+          lucide.createIcons();
+        }
+        return this.enabled;
+      },
+
+      playPop() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.08);
+      },
+
+      playSuccess() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 arpeggio
+        notes.forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+          gain.gain.setValueAtTime(0.2, now + idx * 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.06);
+          osc.stop(now + idx * 0.06 + 0.25);
+        });
+      },
+
+      playError() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(110, this.ctx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.2);
+      },
+
+      playLevelUp() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const notes = [440, 554.37, 659.25, 880];
+        notes.forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+          gain.gain.setValueAtTime(0.3, now + idx * 0.09);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.09 + 0.4);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.09);
+          osc.stop(now + idx * 0.09 + 0.4);
+        });
+      },
+
+      playTick() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.03);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.03);
+      },
+
+      playLaser() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(880, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.12);
+      },
+
+      playExplosion() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(120, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.3);
+      },
+
+      playSlice() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.08);
+      },
+
+      playThrust() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(90, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(180, this.ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.1);
+      }
+    };
+
+    /* ==============================================================
+       2. APP STATE & PERSISTENCE (Zero-Setup LocalStorage)
+       ============================================================== */
+    const LEAGUES = [
+      { id: 'M1', name: 'Sayı Kaşifi', minXp: 0, maxXp: 250, badge: '🧭', desc: 'Temel işlem ve küme refleksi ligi' },
+      { id: 'M2', name: 'Mantık Operatörü', minXp: 250, maxXp: 600, badge: '⚡', desc: 'Önermeler ve doğruluk değerleri' },
+      { id: 'M3', name: 'Denklem Stratejisti', minXp: 600, maxXp: 1100, badge: '⚖️', desc: 'Eşitsizlik ve denklem çözümü' },
+      { id: 'M4', name: 'Oran & Problem Mimarı', minXp: 1100, maxXp: 1800, badge: '🚀', desc: 'Sayı/kesir/oran problemleri' },
+      { id: 'M5', name: 'Soyut Analist', minXp: 1800, maxXp: 2700, badge: '🧬', desc: 'Kümeler, fonksiyonlar ve bağlantılar' },
+      { id: 'M6', name: 'Mat-Grandmaster', minXp: 2700, maxXp: 99999, badge: '👑', desc: 'Sıfır hata, refleks hızında zeka' }
+    ];
+
+    const BADGES = [
+      { id: 'first_blood', name: 'İlk Adım', icon: '🌱', desc: 'İlk mini oyununu tamamla', req: '1 oyun' },
+      { id: 'logic_master', name: 'Mantık Dehası', icon: '🧠', desc: 'Mantık Düellosunda 5 seri yap', req: '5 seri' },
+      { id: 'set_hunter', name: 'Küme Avcısı', icon: '🎯', desc: 'Venn şemasında sıfır hata yap', req: 'Kesişim ustası' },
+      { id: 'balancer', name: 'Denge Ustası', icon: '⚖️', desc: 'Terazi oyununu 3 adımda çöz', req: 'Denge sağla' },
+      { id: 'bomb_defuser', name: 'Bomba İmha', icon: '💣', desc: 'Bölünebilme bombasını son 3 sn kala patlat', req: 'Bomba imhası' },
+      { id: 'rocket_pilot', name: 'Roket Pilotu', icon: '🚀', desc: 'Oran roketini uzaya fırlat', req: 'Yakıtı doldur' },
+      { id: 'card_scholar', name: 'Kart Bilgini', icon: '🃏', desc: '10 formül kartını öğren', req: '10 kart' },
+      { id: 'grandmaster', name: 'M6 Efsanesi', icon: '👑', desc: 'Grandmaster ligine ulaş', req: 'M6 Seviyesi' },
+    ];
+
+    let AppState = {
+      xp: 0,
+      streak: 1,
+      lastActiveDate: new Date().toISOString().split('T')[0],
+      currentLevelId: 'M1',
+      placementResult: null,
+      gamesPlayed: 0,
+      unlockedBadges: [],
+      learnedCards: [],
+
+      load() {
+        const saved = localStorage.getItem('mat_arcade_state_v1');
+        if (saved) {
+          try {
+            const data = JSON.parse(saved);
+            Object.assign(this, data);
+          } catch(e) {
+            console.error('State parse error', e);
+          }
+        }
+        this.checkStreak();
+        this.updateLeague();
+      },
+
+      save() {
+        localStorage.setItem('mat_arcade_state_v1', JSON.stringify({
+          xp: this.xp,
+          streak: this.streak,
+          lastActiveDate: this.lastActiveDate,
+          currentLevelId: this.currentLevelId,
+          placementResult: this.placementResult,
+          gamesPlayed: this.gamesPlayed,
+          unlockedBadges: this.unlockedBadges,
+          learnedCards: this.learnedCards
+        }));
+        this.renderHeaderAndStats();
+      },
+
+      checkStreak() {
+        const today = new Date().toISOString().split('T')[0];
+        if (this.lastActiveDate !== today) {
+          const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+          if (this.lastActiveDate === yesterday) {
+            this.streak += 1;
+          } else {
+            this.streak = 1;
+          }
+          this.lastActiveDate = today;
+        }
+      },
+
+      updateLeague() {
+        for (let i = LEAGUES.length - 1; i >= 0; i--) {
+          if (this.xp >= LEAGUES[i].minXp) {
+            if (this.currentLevelId !== LEAGUES[i].id) {
+              this.currentLevelId = LEAGUES[i].id;
+              if (this.currentLevelId === 'M6') {
+                this.unlockBadge('grandmaster');
+              }
+            }
+            break;
+          }
+        }
+      },
+
+      addXP(amount) {
+        const prevLevel = this.currentLevelId;
+        this.xp += amount;
+        this.updateLeague();
+        this.save();
+
+        if (this.currentLevelId !== prevLevel) {
+          SoundEngine.playLevelUp();
+          confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+          showNotification(`Tebrikler! Yeni Lige Yükseldin: ${this.getCurrentLeague().name} (${this.currentLevelId})! 🎉`);
+        }
+      },
+
+      getCurrentLeague() {
+        return LEAGUES.find(l => l.id === this.currentLevelId) || LEAGUES[0];
+      },
+
+      unlockBadge(badgeId) {
+        if (!this.unlockedBadges.includes(badgeId)) {
+          this.unlockedBadges.push(badgeId);
+          const badge = BADGES.find(b => b.id === badgeId);
+          if (badge) {
+            SoundEngine.playSuccess();
+            confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+            showNotification(`🏆 Yeni Rozet Açıldı: ${badge.name}!`);
+          }
+          this.save();
+        }
+      },
+
+      reset() {
+        localStorage.removeItem('mat_arcade_state_v1');
+        this.xp = 0;
+        this.streak = 1;
+        this.currentLevelId = 'M1';
+        this.placementResult = null;
+        this.gamesPlayed = 0;
+        this.unlockedBadges = [];
+        this.learnedCards = [];
+        this.save();
+        location.reload();
+      },
+
+      renderHeaderAndStats() {
+        document.getElementById('header-xp-count').textContent = this.xp;
+        document.getElementById('header-streak-count').textContent = this.streak;
+        
+        const curLeague = this.getCurrentLeague();
+        document.getElementById('header-level-badge').textContent = curLeague.id;
+        document.getElementById('header-level-title').textContent = curLeague.name;
+
+        // Progress bar calc
+        const nextLeague = LEAGUES.find(l => l.minXp > this.xp);
+        const progressBar = document.getElementById('header-level-bar');
+        const nextXpLabel = document.getElementById('header-next-xp');
+
+        if (nextLeague) {
+          const range = nextLeague.minXp - curLeague.minXp;
+          const currentProgress = this.xp - curLeague.minXp;
+          const percent = Math.min(100, Math.max(0, (currentProgress / range) * 100));
+          progressBar.style.width = `${percent}%`;
+          nextXpLabel.textContent = `${nextLeague.minXp - this.xp} XP kaldı`;
+        } else {
+          progressBar.style.width = '100%';
+          nextXpLabel.textContent = 'Maksimum Lig!';
+        }
+
+        // Placement Tab status card
+        const statusAvatar = document.getElementById('status-level-avatar');
+        const statusName = document.getElementById('status-level-name');
+        const statusDesc = document.getElementById('status-level-desc');
+        if (statusAvatar && statusName && statusDesc) {
+          statusAvatar.textContent = curLeague.id;
+          statusName.textContent = curLeague.name;
+          statusDesc.textContent = curLeague.desc;
+        }
+
+        // Profile tab values
+        const profXp = document.getElementById('prof-xp');
+        const profGames = document.getElementById('prof-games');
+        const profBadges = document.getElementById('prof-badges');
+        const profAvatar = document.getElementById('profile-avatar');
+        const profBadge = document.getElementById('profile-level-badge');
+        if (profXp) profXp.textContent = this.xp;
+        if (profGames) profGames.textContent = this.gamesPlayed;
+        if (profBadges) profBadges.textContent = `${this.unlockedBadges.length}/${BADGES.length}`;
+        if (profAvatar) profAvatar.textContent = curLeague.id;
+        if (profBadge) profBadge.textContent = `${curLeague.id} Ligi - ${curLeague.name}`;
+
+        const badgePercent = document.getElementById('badge-completion-percent');
+        if (badgePercent) {
+          badgePercent.textContent = `%${Math.round((this.unlockedBadges.length / BADGES.length) * 100)} Tamamlandı`;
+        }
+
+        renderLeagueLadder();
+        renderBadgesGrid();
+      }
+    };
+
+    /* Notification Toast */
+    function showNotification(msg) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed top-14 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-slate-900/90 backdrop-blur-md text-white text-xs font-bold shadow-xl flex items-center space-x-2 transition-all duration-300 pointer-events-none';
+      toast.innerHTML = `<span>✨</span><span>${msg}</span>`;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translate(-50%, -10px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    /* ==============================================================
+       3. NAVIGATION & TABS
+       ============================================================== */
+    function initTabs() {
+      const tabButtons = document.querySelectorAll('.nav-tab-btn');
+      const tabViews = document.querySelectorAll('.tab-view');
+
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          SoundEngine.playPop();
+          const targetTabId = btn.getAttribute('data-tab');
+
+          tabButtons.forEach(b => {
+            b.classList.remove('text-indigo-600', 'font-bold');
+            b.classList.add('text-slate-400');
+          });
+          btn.classList.add('text-indigo-600', 'font-bold');
+          btn.classList.remove('text-slate-400');
+
+          tabViews.forEach(view => {
+            if (view.id === targetTabId) {
+              view.classList.remove('hidden');
+            } else {
+              view.classList.add('hidden');
+            }
+          });
+
+          if (targetTabId === 'tab-cards') {
+            initFlashcardsView();
+          }
+        });
+      });
+    }
+
+    function renderLeagueLadder() {
+      const container = document.getElementById('league-ladder-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      LEAGUES.forEach(league => {
+        const isCurrent = AppState.currentLevelId === league.id;
+        const isUnlocked = AppState.xp >= league.minXp;
+
+        const row = document.createElement('div');
+        row.className = `flex items-center justify-between p-2.5 rounded-2xl transition-all ${
+          isCurrent 
+            ? 'bg-indigo-50 border border-indigo-200 shadow-sm' 
+            : isUnlocked 
+              ? 'bg-slate-50/80 border border-slate-100' 
+              : 'opacity-50 bg-slate-50/40 border border-transparent'
+        }`;
+
+        row.innerHTML = `
+          <div class="flex items-center space-x-2.5">
+            <span class="w-8 h-8 rounded-xl ${isCurrent ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-700'} flex items-center justify-center font-black text-xs">
+              ${league.id}
+            </span>
+            <div>
+              <div class="flex items-center space-x-1.5">
+                <span class="font-bold text-xs ${isCurrent ? 'text-indigo-900' : 'text-slate-800'}">${league.name}</span>
+                ${isCurrent ? '<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-indigo-200 text-indigo-800 font-extrabold">ŞU AN</span>' : ''}
+              </div>
+              <span class="text-[10px] text-slate-400">${league.desc}</span>
+            </div>
+          </div>
+          <span class="text-[10px] font-bold ${isUnlocked ? 'text-emerald-600' : 'text-slate-400'}">
+            ${league.minXp} XP+
+          </span>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function renderBadgesGrid() {
+      const grid = document.getElementById('badges-grid-container');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      BADGES.forEach(b => {
+        const unlocked = AppState.unlockedBadges.includes(b.id);
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-2xl border transition-all ${
+          unlocked 
+            ? 'bg-gradient-to-br from-white to-amber-50/40 border-amber-200/80 shadow-sm' 
+            : 'bg-slate-50 border-slate-100 opacity-55'
+        }`;
+        card.innerHTML = `
+          <div class="flex items-center space-x-2.5">
+            <span class="text-2xl filter ${unlocked ? '' : 'grayscale'}">${b.icon}</span>
+            <div>
+              <h5 class="text-xs font-bold ${unlocked ? 'text-slate-900' : 'text-slate-500'}">${b.name}</h5>
+              <p class="text-[10px] text-slate-400 line-clamp-1">${b.desc}</p>
+            </div>
+          </div>
+          <div class="mt-2 text-right">
+            <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full ${unlocked ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}">
+              ${unlocked ? 'AÇILDI ✓' : b.req}
+            </span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    /* ==============================================================
+       4. ADAPTİF SEVİYE TESPİT TESTİ (M1 - M6 RADAR)
+       ============================================================== */
+    const PLACEMENT_QUESTIONS = [
+      {
+        id: 1,
+        topic: 'Mantık & Doğruluk',
+        level: 'M1',
+        text: 'p ≡ 1 ve q ≡ 0 ise, p ∧ q doğruluk değeri nedir?',
+        options: ['1', '0'],
+        correct: '0',
+        hint: 'Ve (∧) bağlacında bir tane bile 0 varsa sonuç 0 olur.'
+      },
+      {
+        id: 2,
+        topic: 'Mantık & De Morgan',
+        level: 'M2',
+        text: "(1 ∨ 0)' ∧ 1 işleminin sonucu nedir?",
+        options: ['1', '0'],
+        correct: '0',
+        hint: "(1 ∨ 0) = 1, değili (1)' = 0, 0 ∧ 1 = 0."
+      },
+      {
+        id: 3,
+        topic: 'Kümeler',
+        level: 'M2',
+        text: 'A = {2, 3, 5, 7} kümesinin alt küme sayısı kaçtır?',
+        options: ['8', '16', '32', '4'],
+        correct: '16',
+        hint: 'n elemanlı bir kümenin alt küme sayısı 2ⁿ formülüyle hesaplanır (2⁴ = 16).'
+      },
+      {
+        id: 4,
+        topic: 'Kümeler & Kesişim',
+        level: 'M3',
+        text: 's(A) = 7, s(B) = 5 ve s(A ∩ B) = 3 ise, s(A ∪ B) kaçtır?',
+        options: ['9', '12', '15', '8'],
+        correct: '9',
+        hint: 's(A ∪ B) = s(A) + s(B) - s(A ∩ B) = 7 + 5 - 3 = 9.'
+      },
+      {
+        id: 5,
+        topic: '1. Dereceden Denklem',
+        level: 'M3',
+        text: '3x - 5 = 16 denkleminde x kaçtır?',
+        options: ['7', '6', '8', '5'],
+        correct: '7',
+        hint: '3x = 16 + 5 = 21 ⟹ x = 7.'
+      },
+      {
+        id: 6,
+        topic: 'Mutlak Değer',
+        level: 'M3',
+        text: '|2x - 4| = 6 denkleminin pozitif kökü kaçtır?',
+        options: ['5', '3', '4', '1'],
+        correct: '5',
+        hint: '2x - 4 = 6 ⟹ 2x = 10 ⟹ x = 5.'
+      },
+      {
+        id: 7,
+        topic: 'Bölünebilme',
+        level: 'M4',
+        text: 'Dört basamaklı 5A32 sayısı 9 ile tam bölünüyorsa A kaçtır?',
+        options: ['8', '7', '4', '9'],
+        correct: '8',
+        hint: 'Rakamlar toplamı: 5 + A + 3 + 2 = 10 + A, 9 un katı olması için A = 8 olmalı.'
+      },
+      {
+        id: 8,
+        topic: 'Oran & Orantı',
+        level: 'M4',
+        text: '4 işçi bir işi 12 günde bitirirse, 6 işçi aynı işi kaç günde bitirir?',
+        options: ['8 gün', '18 gün', '6 gün', '10 gün'],
+        correct: '8 gün',
+        hint: 'Ters orantı: 4 · 12 = 6 · x ⟹ 48 = 6x ⟹ x = 8.'
+      },
+      {
+        id: 9,
+        topic: 'Koşullu Önerme',
+        level: 'M5',
+        text: "p ⇒ q önermesi aşağıdakilerden hangisine denktir?",
+        options: ["p' ∨ q", "p ∧ q'", "p' ∧ q", "p ∨ q'"],
+        correct: "p' ∨ q",
+        hint: 'Koşullu önerme kuralı: p ⇒ q ≡ p\' ∨ q'
+      },
+      {
+        id: 10,
+        topic: 'Mutlak Değer Eşitsizliği',
+        level: 'M6',
+        text: '|x - 3| ≤ 5 eşitsizliğini sağlayan en küçük ve en büyük tam sayıların toplamı kaçtır?',
+        options: ['6', '8', '10', '0'],
+        correct: '6',
+        hint: '-5 ≤ x - 3 ≤ 5 ⟹ -2 ≤ x ≤ 8. En küçük -2, en büyük 8, toplam: 6.'
+      }
+    ];
+
+    let PlacementEngine = {
+      currentIndex: 0,
+      score: 0,
+      totalTime: 0,
+      timerVal: 15,
+      timerInterval: null,
+      adaptiveLevelScore: 1, // 1 to 6 scale
+
+      start() {
+        this.currentIndex = 0;
+        this.score = 0;
+        this.totalTime = 0;
+        this.adaptiveLevelScore = 1;
+        document.getElementById('placement-modal').classList.remove('hidden');
+        setTimeout(() => {
+          document.getElementById('placement-modal').classList.remove('opacity-0');
+          lucide.createIcons();
+        }, 10);
+        this.loadQuestion();
+      },
+
+      loadQuestion() {
+        clearInterval(this.timerInterval);
+        if (this.currentIndex >= PLACEMENT_QUESTIONS.length) {
+          this.finish();
+          return;
+        }
+
+        const q = PLACEMENT_QUESTIONS[this.currentIndex];
+        document.getElementById('test-q-index').textContent = `Soru ${this.currentIndex + 1} / ${PLACEMENT_QUESTIONS.length}`;
+        document.getElementById('test-topic-tag').textContent = q.topic;
+        document.getElementById('test-diff-tag').textContent = `Lig: ${q.level}`;
+        document.getElementById('test-question-text').textContent = q.text;
+        document.getElementById('test-question-hint').textContent = '';
+
+        const progressPercent = ((this.currentIndex) / PLACEMENT_QUESTIONS.length) * 100;
+        document.getElementById('test-progress-bar').style.width = `${progressPercent}%`;
+
+        // Render option buttons
+        const optContainer = document.getElementById('test-options-container');
+        optContainer.innerHTML = '';
+        optContainer.className = q.options.length === 2 ? 'grid grid-cols-2 gap-3 pt-1' : 'grid grid-cols-2 gap-2.5 pt-1';
+
+        q.options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = 'py-3 px-4 rounded-2xl bg-white border border-slate-200 shadow-sm font-bold text-slate-800 text-sm active:scale-95 hover:border-indigo-400 transition-all text-center';
+          btn.textContent = opt;
+          btn.onclick = () => this.handleAnswer(opt, btn);
+          optContainer.appendChild(btn);
+        });
+
+        // Start countdown
+        this.timerVal = 15;
+        document.getElementById('test-timer').textContent = `${this.timerVal}s`;
+        this.timerInterval = setInterval(() => {
+          this.timerVal--;
+          this.totalTime++;
+          document.getElementById('test-timer').textContent = `${this.timerVal}s`;
+          if (this.timerVal <= 4) {
+            SoundEngine.playTick();
+          }
+          if (this.timerVal <= 0) {
+            clearInterval(this.timerInterval);
+            SoundEngine.playError();
+            this.handleTimeout();
+          }
+        }, 1000);
+      },
+
+      handleAnswer(selected, btnElement) {
+        clearInterval(this.timerInterval);
+        const q = PLACEMENT_QUESTIONS[this.currentIndex];
+        const isCorrect = selected === q.correct;
+
+        const allButtons = document.querySelectorAll('#test-options-container button');
+        allButtons.forEach(b => b.disabled = true);
+
+        if (isCorrect) {
+          SoundEngine.playSuccess();
+          btnElement.classList.remove('bg-white', 'border-slate-200');
+          btnElement.classList.add('bg-emerald-500', 'text-white', 'border-emerald-500');
+          this.score++;
+          this.adaptiveLevelScore += 0.6;
+        } else {
+          SoundEngine.playError();
+          btnElement.classList.remove('bg-white', 'border-slate-200');
+          btnElement.classList.add('bg-rose-500', 'text-white', 'border-rose-500');
+          document.getElementById('placement-modal').classList.add('shake-target');
+          setTimeout(() => document.getElementById('placement-modal').classList.remove('shake-target'), 400);
+
+          // Highlight correct
+          allButtons.forEach(b => {
+            if (b.textContent === q.correct) {
+              b.classList.add('bg-emerald-100', 'border-emerald-400', 'text-emerald-800');
+            }
+          });
+          document.getElementById('test-question-hint').textContent = `💡 İpucu: ${q.hint}`;
+        }
+
+        setTimeout(() => {
+          this.currentIndex++;
+          this.loadQuestion();
+        }, isCorrect ? 500 : 1400);
+      },
+
+      handleTimeout() {
+        const q = PLACEMENT_QUESTIONS[this.currentIndex];
+        document.getElementById('test-question-hint').textContent = `⏳ Zaman doldu! Doğru cevap: ${q.correct}`;
+        setTimeout(() => {
+          this.currentIndex++;
+          this.loadQuestion();
+        }, 1200);
+      },
+
+      finish() {
+        clearInterval(this.timerInterval);
+        closePlacementTest();
+
+        // Calculate League Placement
+        let assignedLeagueId = 'M1';
+        let feedbackQuote = '';
+
+        if (this.score >= 9) {
+          assignedLeagueId = 'M6';
+          feedbackQuote = "Olağanüstü refleks! Sıfır hata, ışık hızında analitik zeka. 9. Sınıf Maarif Modeli Grandmaster seviyesindesin!";
+        } else if (this.score >= 7) {
+          assignedLeagueId = 'M5';
+          feedbackQuote = "Soyut analist seviyesindesin! Kümeler ve mantık kurgun harika, birkaç ufak dikkatsizlikle M6 ligini kaçırdın.";
+        } else if (this.score >= 5) {
+          assignedLeagueId = 'M4';
+          feedbackQuote = "Hızın müthiş! Denklem çözümlerinde roket gibisin ama mantık bağlaçlarında dikkatin dağıldı. Arcade modunda pratik yap!";
+        } else if (this.score >= 3) {
+          assignedLeagueId = 'M3';
+          feedbackQuote = "Denklem stratejisti ligine yerleştin! İşlem temelin sağlam, önermeler ve mutlak değerde biraz antrenmana ihtiyacın var.";
+        } else if (this.score >= 1) {
+          assignedLeagueId = 'M2';
+          feedbackQuote = "Mantık operatörü ligindesin! Temel adımları iyi attın, mini oyunlarla formülleri reflex haline getirebilirsin.";
+        } else {
+          assignedLeagueId = 'M1';
+          feedbackQuote = "Sayı kaşifi liginden maceraya başlıyorsun! Arcade modundaki eğlenceli oyunlarla hızla zirveye çıkacaksın.";
+        }
+
+        const leagueObj = LEAGUES.find(l => l.id === assignedLeagueId);
+        
+        // Award placement XP
+        const earnedXp = Math.max(100, this.score * 35);
+        AppState.xp = Math.max(AppState.xp, leagueObj.minXp);
+        AppState.addXP(earnedXp);
+        AppState.placementResult = {
+          score: this.score,
+          league: assignedLeagueId,
+          date: new Date().toLocaleDateString('tr-TR')
+        };
+        AppState.save();
+
+        // Show Instagram Story Card
+        openStoryReport(leagueObj, feedbackQuote, this.score, this.totalTime, earnedXp);
+      }
+    };
+
+    function closePlacementTest() {
+      clearInterval(PlacementEngine.timerInterval);
+      const modal = document.getElementById('placement-modal');
+      modal.classList.add('opacity-0');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    /* Instagram Story Report Modal */
+    function openStoryReport(league, quote, score, totalTime, xp) {
+      document.getElementById('story-level-title').textContent = `${league.id} - ${league.name.toUpperCase()}`;
+      document.getElementById('story-badge-pill').textContent = league.desc;
+      document.getElementById('story-feedback-quote').textContent = `"${quote}"`;
+      document.getElementById('story-accuracy').textContent = `${score}/10`;
+      
+      const avgTime = (totalTime / 10).toFixed(1);
+      document.getElementById('story-avg-time').textContent = `${avgTime}s`;
+      document.getElementById('story-xp-gained').textContent = `+${xp}`;
+
+      const modal = document.getElementById('story-report-modal');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        lucide.createIcons();
+      }, 10);
+
+      SoundEngine.playLevelUp();
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.5 } });
+    }
+
+    function closeStoryReport() {
+      const modal = document.getElementById('story-report-modal');
+      modal.classList.add('opacity-0');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        // Switch to arcade tab
+        document.querySelector('[data-tab="tab-arcade"]').click();
+      }, 300);
+    }
+
+    // Story Share Web API
+    document.getElementById('story-share-btn')?.addEventListener('click', () => {
+      SoundEngine.playPop();
+      const shareData = {
+        title: '9. Sınıf Maarif Matematik Ligim!',
+        text: `Matematik Arcade testinde ${AppState.currentLevelId} - ${AppState.getCurrentLeague().name} ligine yerleştim! Sen de analitik refleksini test et!`,
+        url: window.location.href
+      };
+
+      if (navigator.share) {
+        navigator.share(shareData).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(`${shareData.text} 🚀 ${shareData.url}`).then(() => {
+          showNotification('Sonucun panoya kopyalandı! Arkadaşlarınla paylaş 🚀');
+        });
+      }
+    });
+
+    /* ==============================================================
+       5. ARCADE MODU: 7 BİREBİR OYNANABİLİR OYUN MOTORLARI
+       (Canvas 60fps, Fizik, Parçacıklar, Dokunmatik Aksiyon)
+       ============================================================== */
+    let CurrentGameLoop = null;
+    let GameIntervals = [];
+
+    function clearActiveGame() {
+      if (CurrentGameLoop) {
+        cancelAnimationFrame(CurrentGameLoop);
+        clearInterval(CurrentGameLoop);
+        CurrentGameLoop = null;
+      }
+      GameIntervals.forEach(id => clearInterval(id));
+      GameIntervals = [];
+    }
+
+    function openGame(gameType) {
+      clearActiveGame();
+      SoundEngine.playPop();
+      const modal = document.getElementById('game-modal');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        lucide.createIcons();
+      }, 10);
+
+      AppState.gamesPlayed++;
+      AppState.unlockBadge('first_blood');
+      AppState.save();
+
+      switch(gameType) {
+        case 'logic_runner':
+          initLogicRunner();
+          break;
+        case 'set_drop':
+          initSetDrop();
+          break;
+        case 'scale_balance':
+          initScaleBalance();
+          break;
+        case 'laser_shield':
+          initLaserShield();
+          break;
+        case 'ratio_rocket':
+          initRatioRocket();
+          break;
+        case 'bomb_rush':
+          initBombRush();
+          break;
+        case 'swipe_cards':
+          closeGameArena();
+          document.querySelector('[data-tab="tab-cards"]').click();
+          break;
+      }
+    }
+
+    function closeGameArena() {
+      clearActiveGame();
+      const modal = document.getElementById('game-modal');
+      modal.classList.add('opacity-0');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        document.getElementById('game-stage').innerHTML = '';
+        document.getElementById('game-arena-footer').innerHTML = '';
+      }, 300);
+    }
+
+    function getCanvasCoords(canvas, e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
+      };
+    }
+
+    /* -------------------------------------------------------------
+       OYUN 1: MANTIK DÜELLOSU (GATE RUNNER - 2D CANYON RUNNER)
+       ------------------------------------------------------------- */
+    function initLogicRunner() {
+      document.getElementById('arena-game-icon').textContent = '⚡';
+      document.getElementById('arena-game-title').textContent = 'Mantık Düellosu (Gate Runner)';
+      
+      const stage = document.getElementById('game-stage');
+      const footer = document.getElementById('game-arena-footer');
+      stage.innerHTML = `<canvas id="runner-canvas" width="340" height="380" class="w-full max-w-[340px] h-[380px] rounded-2xl bg-slate-950 shadow-2xl touch-none mx-auto block"></canvas>`;
+      footer.innerHTML = `
+        <div class="flex items-center justify-between text-xs text-slate-500 px-1">
+          <span>👈 Sol Taraf: <b>Sol Şerit</b></span>
+          <span class="font-bold text-amber-500" id="runner-lives-hud">Can: ❤️❤️❤️</span>
+          <span>Sağ Taraf: <b>Sağ Şerit</b> 👉</span>
+        </div>
+      `;
+
+      const canvas = document.getElementById('runner-canvas');
+      const ctx = canvas.getContext('2d');
+
+      let score = 0;
+      let streak = 0;
+      let lives = 3;
+      let lane = 0; // 0 = left (x: 85), 1 = right (x: 255)
+      let playerX = 85;
+      let speed = 4;
+      let gateY = -60;
+      let particles = [];
+      let starfield = Array.from({ length: 40 }, () => ({
+        x: Math.random() * 340,
+        y: Math.random() * 380,
+        speed: 1 + Math.random() * 3,
+        size: 1 + Math.random() * 2
+      }));
+
+      const propositions = [
+        { q: '1 ∧ 0', ans: 0 },
+        { q: '1 ∨ 0', ans: 1 },
+        { q: '0 ∧ 0', ans: 0 },
+        { q: '1 ∧ 1', ans: 1 },
+        { q: "(1 ∧ 1)'", ans: 0 },
+        { q: "(0 ∨ 0)'", ans: 1 },
+        { q: '1 ⇒ 0', ans: 0 },
+        { q: '0 ⇒ 1', ans: 1 },
+        { q: '1 ⇒ 1', ans: 1 },
+        { q: '0 ⇒ 0', ans: 1 },
+        { q: '1 ⇔ 1', ans: 1 },
+        { q: '1 ⇔ 0', ans: 0 },
+        { q: '0 ⇔ 0', ans: 1 },
+        { q: "p ∧ p'", ans: 0 },
+        { q: "p ∨ p'", ans: 1 },
+        { q: 'p ⇒ 0 (p=1)', ans: 0 },
+        { q: 'p ⇒ 1 (p=0)', ans: 1 }
+      ];
+
+      let currentPropIndex = 0;
+      let leftGateVal = 1;
+      let rightGateVal = 0;
+      let totalPassed = 0;
+
+      function setupNextGate() {
+        const item = propositions[Math.floor(Math.random() * propositions.length)];
+        currentPropIndex = item;
+        const correctOnLeft = Math.random() > 0.5;
+        if (correctOnLeft) {
+          leftGateVal = item.ans;
+          rightGateVal = item.ans === 1 ? 0 : 1;
+        } else {
+          rightGateVal = item.ans;
+          leftGateVal = item.ans === 1 ? 0 : 1;
+        }
+        gateY = -60;
+      }
+
+      setupNextGate();
+
+      function spawnParticles(x, y, color) {
+        for (let i = 0; i < 20; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const spd = 2 + Math.random() * 5;
+          particles.push({
+            x, y,
+            vx: Math.cos(angle) * spd,
+            vy: Math.sin(angle) * spd,
+            life: 1,
+            color
+          });
+        }
+      }
+
+      function handleTouch(e) {
+        e.preventDefault();
+        const pos = getCanvasCoords(canvas, e);
+        if (pos.x < 170) {
+          lane = 0;
+        } else {
+          lane = 1;
+        }
+        SoundEngine.playPop();
+      }
+
+      canvas.addEventListener('touchstart', handleTouch, { passive: false });
+      canvas.addEventListener('mousedown', handleTouch);
+
+      function updateAndRender() {
+        // Clear
+        ctx.fillStyle = '#020617';
+        ctx.fillRect(0, 0, 340, 380);
+
+        // Starfield
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        starfield.forEach(s => {
+          s.y += s.speed;
+          if (s.y > 380) s.y = 0;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Road lanes
+        ctx.strokeStyle = 'rgba(99, 102, 241, 0.25)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(170, 0);
+        ctx.lineTo(170, 380);
+        ctx.stroke();
+
+        // Player Ship Animation
+        const targetX = lane === 0 ? 85 : 255;
+        playerX += (targetX - playerX) * 0.25;
+
+        // Draw Player Ship (Neon Jet)
+        ctx.save();
+        ctx.translate(playerX, 320);
+        // Thruster flame
+        ctx.fillStyle = Math.random() > 0.5 ? '#f59e0b' : '#ef4444';
+        ctx.beginPath();
+        ctx.moveTo(-6, 12);
+        ctx.lineTo(6, 12);
+        ctx.lineTo(0, 22 + Math.random() * 6);
+        ctx.fill();
+
+        // Craft body
+        ctx.fillStyle = '#6366f1';
+        ctx.beginPath();
+        ctx.moveTo(0, -18);
+        ctx.lineTo(16, 12);
+        ctx.lineTo(0, 6);
+        ctx.lineTo(-16, 12);
+        ctx.closePath();
+        ctx.fill();
+
+        // Cockpit
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath();
+        ctx.arc(0, -2, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Gate Movement
+        gateY += speed;
+
+        // Draw HUD / Question at top
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.fillRect(10, 8, 320, 48);
+        ctx.strokeStyle = '#6366f1';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(10, 8, 320, 48);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('ÖNERME DOĞRULUK DEĞERİ?', 170, 24);
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 18px monospace';
+        ctx.fillText(`${currentPropIndex.q} = ?`, 170, 46);
+
+        // Draw Gates
+        function drawGate(x, val, color) {
+          ctx.save();
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 4;
+          ctx.shadowColor = color;
+          ctx.shadowBlur = 12;
+          ctx.strokeRect(x - 55, gateY - 20, 110, 40);
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
+          ctx.fillRect(x - 55, gateY - 20, 110, 40);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'black 16px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(val === 1 ? '1 (DOĞRU)' : '0 (YANLIŞ)', x, gateY + 5);
+          ctx.restore();
+        }
+
+        drawGate(85, leftGateVal, leftGateVal === 1 ? '#10b981' : '#f43f5e');
+        drawGate(255, rightGateVal, rightGateVal === 1 ? '#10b981' : '#f43f5e');
+
+        // Collision Check
+        if (gateY >= 310 && gateY <= 310 + speed) {
+          const chosenVal = lane === 0 ? leftGateVal : rightGateVal;
+          if (chosenVal === currentPropIndex.ans) {
+            // Correct gate!
+            SoundEngine.playSuccess();
+            SoundEngine.playLaser();
+            score += 100 + streak * 25;
+            streak++;
+            totalPassed++;
+            spawnParticles(playerX, 320, '#10b981');
+            speed = Math.min(8.5, speed + 0.35);
+            if (streak >= 5) AppState.unlockBadge('logic_master');
+          } else {
+            // Wrong gate!
+            SoundEngine.playError();
+            SoundEngine.playExplosion();
+            lives--;
+            streak = 0;
+            spawnParticles(playerX, 320, '#ef4444');
+            canvas.classList.add('shake-target');
+            setTimeout(() => canvas.classList.remove('shake-target'), 350);
+          }
+
+          document.getElementById('arena-game-score').textContent = `Skor: ${score} • Seri: x${streak}`;
+          const livesHud = document.getElementById('runner-lives-hud');
+          if (livesHud) livesHud.textContent = `Can: ${'❤️'.repeat(Math.max(0, lives))}`;
+
+          if (lives <= 0) {
+            cancelAnimationFrame(CurrentGameLoop);
+            finishRunner(false);
+            return;
+          } else if (totalPassed >= 10) {
+            cancelAnimationFrame(CurrentGameLoop);
+            finishRunner(true);
+            return;
+          } else {
+            setupNextGate();
+          }
+        }
+
+        // Update Particles
+        particles.forEach((p, idx) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.life -= 0.04;
+          if (p.life <= 0) {
+            particles.splice(idx, 1);
+          } else {
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.life;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+          }
+        });
+
+        CurrentGameLoop = requestAnimationFrame(updateAndRender);
+      }
+
+      function finishRunner(won) {
+        if (won) {
+          SoundEngine.playLevelUp();
+          confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+          AppState.addXP(Math.round(score * 0.5) + 50);
+        }
+        stage.innerHTML = `
+          <div class="text-center p-5 animate-in zoom-in-95">
+            <span class="text-5xl">${won ? '🏆' : '💥'}</span>
+            <h3 class="text-xl font-black text-slate-800 mt-2">${won ? 'Gate Runner Şampiyonu!' : 'Gemi Hasar Aldı!'}</h3>
+            <p class="text-xs text-slate-500 mt-1">${won ? '10 mantık kapısını başarıyla aştın!' : 'Refleks hızını artırıp tekrar dene.'}</p>
+            <div class="mt-4 p-3 rounded-2xl bg-indigo-50 border border-indigo-200 font-extrabold text-indigo-700 text-base">
+              ${won ? `+${Math.round(score * 0.5) + 50} XP Kazandın!` : `Skor: ${score}`}
+            </div>
+            <div class="mt-4 flex items-center justify-center space-x-3">
+              <button onclick="initLogicRunner()" class="px-5 py-2.5 rounded-full bg-indigo-600 text-white font-bold text-xs shadow-md">
+                Tekrar Oyna 🔄
+              </button>
+              <button onclick="closeGameArena()" class="px-5 py-2.5 rounded-full bg-slate-200 text-slate-700 font-bold text-xs">
+                Kapat
+              </button>
+            </div>
+          </div>
+        `;
+        footer.innerHTML = '';
+      }
+
+      CurrentGameLoop = requestAnimationFrame(updateAndRender);
+    }
+
+    /* -------------------------------------------------------------
+       OYUN 2: VENN KESİŞİM FIRLATMASI (SET DROP / SLINGSHOT CANNON)
+       ------------------------------------------------------------- */
+    function initSetDrop() {
+      document.getElementById('arena-game-icon').textContent = '🎯';
+      document.getElementById('arena-game-title').textContent = 'Venn Kesişim Sapanı';
+
+      const stage = document.getElementById('game-stage');
+      const footer = document.getElementById('game-arena-footer');
+      stage.innerHTML = `<canvas id="venn-canvas" width="340" height="380" class="w-full max-w-[340px] h-[380px] rounded-2xl bg-slate-900 shadow-2xl touch-none mx-auto block"></canvas>`;
+      footer.innerHTML = `
+        <div class="text-center text-xs text-slate-400 font-medium">
+          Topu tutup <b>geriye çek ve nişan al</b>, doğru küme havuzuna fırlat! 🏹
+        </div>
+      `;
+
+      const canvas = document.getElementById('venn-canvas');
+      const ctx = canvas.getContext('2d');
+
+      const numberPool = [6, 8, 9, 12, 14, 15, 18, 7, 20, 21, 24, 11];
+      let poolIndex = 0;
+      let score = 0;
+      let streak = 0;
+
+      // Slingshot Base & Ball State
+      const anchorX = 170;
+      const anchorY = 320;
+      let ballX = anchorX;
+      let ballY = anchorY;
+      let ballVx = 0;
+      let ballVy = 0;
+      let isDragging = false;
+      let isFlying = false;
+      let particles = [];
+      let resultToast = null;
+
+      function getCurrentNumber() {
+        return numberPool[poolIndex % numberPool.length];
+      }
+
+      function onTouchStart(e) {
+        if (isFlying) return;
+        const pos = getCanvasCoords(canvas, e);
+        const dist = Math.hypot(pos.x - ballX, pos.y - ballY);
+        if (dist < 40) {
+          isDragging = true;
+          SoundEngine.playPop();
+        }
+      }
+
+      function onTouchMove(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        const pos = getCanvasCoords(canvas, e);
+        // Clamp pull distance
+        const dx = pos.x - anchorX;
+        const dy = pos.y - anchorY;
+        const dist = Math.hypot(dx, dy);
+        const maxDist = 70;
+        if (dist > maxDist) {
+          ballX = anchorX + (dx / dist) * maxDist;
+          ballY = anchorY + (dy / dist) * maxDist;
+        } else {
+          ballX = pos.x;
+          ballY = pos.y;
+        }
+      }
+
+      function onTouchEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+        const pullX = anchorX - ballX;
+        const pullY = anchorY - ballY;
+        const dist = Math.hypot(pullX, pullY);
+
+        if (dist > 15) {
+          isFlying = true;
+          ballVx = pullX * 0.22;
+          ballVy = pullY * 0.22;
+          SoundEngine.playLaser();
+        } else {
+          ballX = anchorX;
+          ballY = anchorY;
+        }
+      }
+
+      canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+      canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+      canvas.addEventListener('touchend', onTouchEnd);
+
+      canvas.addEventListener('mousedown', onTouchStart);
+      window.addEventListener('mousemove', onTouchMove);
+      window.addEventListener('mouseup', onTouchEnd);
+
+      function evaluateZone(bx, by) {
+        // Venn centers: A (115, 120), B (225, 120), radius 65
+        const distA = Math.hypot(bx - 115, by - 120) < 65;
+        const distB = Math.hypot(bx - 225, by - 120) < 65;
+
+        let landedZone = 'OUT';
+        if (distA && distB) landedZone = 'INTERSECTION';
+        else if (distA && !distB) landedZone = 'ONLY_A';
+        else if (!distA && distB) landedZone = 'ONLY_B';
+
+        const num = getCurrentNumber();
+        const isA = num % 2 === 0;
+        const isB = num % 3 === 0;
+
+        let correctZone = 'OUT';
+        if (isA && isB) correctZone = 'INTERSECTION';
+        else if (isA && !isB) correctZone = 'ONLY_A';
+        else if (!isA && isB) correctZone = 'ONLY_B';
+
+        if (landedZone === correctZone) {
+          SoundEngine.playSuccess();
+          score += 50;
+          streak++;
+          resultToast = { text: '🎯 TAM İSABET! +50', color: '#10b981', life: 1 };
+          if (streak >= 5) AppState.unlockBadge('set_hunter');
+        } else {
+          SoundEngine.playError();
+          streak = 0;
+          resultToast = { text: '❌ YANLIŞ BÖLGE!', color: '#ef4444', life: 1 };
+        }
+
+        document.getElementById('arena-game-score').textContent = `Skor: ${score} • Atış: ${poolIndex + 1}/10`;
+        poolIndex++;
+
+        // Reset ball
+        setTimeout(() => {
+          ballX = anchorX;
+          ballY = anchorY;
+          ballVx = 0;
+          ballVy = 0;
+          isFlying = false;
+          if (poolIndex >= 10) {
+            cancelAnimationFrame(CurrentGameLoop);
+            finishSetDrop();
+          }
+        }, 800);
+      }
+
+      function updateAndRender() {
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, 340, 380);
+
+        // Top Info Banner
+        ctx.fillStyle = 'rgba(255,255,255,0.06)';
+        ctx.fillRect(8, 6, 324, 30);
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('A: ÇİFT SAYILAR  |  B: 3\'ÜN KATLARI', 170, 25);
+
+        // Venn Diagrams
+        // Circle A (Cyan)
+        ctx.save();
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(115, 120, 65, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Circle B (Emerald)
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
+        ctx.strokeStyle = '#10b981';
+        ctx.beginPath();
+        ctx.arc(225, 120, 65, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Labels
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText('SADECE A', 85, 120);
+
+        ctx.fillStyle = '#10b981';
+        ctx.fillText('SADECE B', 255, 120);
+
+        // Intersection Label
+        ctx.fillStyle = '#c084fc';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.fillText('A ∩ B', 170, 115);
+        ctx.fillText('(Kesişim)', 170, 128);
+
+        // Outer area box
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.strokeRect(10, 45, 320, 160);
+        ctx.fillStyle = '#64748b';
+        ctx.font = '9px sans-serif';
+        ctx.fillText('Dış Bölge (Evrensel Küme)', 65, 58);
+        ctx.restore();
+
+        // Slingshot Trajectory line when dragging
+        if (isDragging) {
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          const pvx = (anchorX - ballX) * 0.22;
+          const pvy = (anchorY - ballY) * 0.22;
+          let simX = ballX;
+          let simY = ballY;
+          ctx.moveTo(simX, simY);
+          for (let step = 0; step < 18; step++) {
+            simX += pvx;
+            simY += pvy + 0.25 * step;
+            ctx.lineTo(simX, simY);
+          }
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Elastic rubber bands
+          ctx.strokeStyle = '#f59e0b';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(anchorX - 25, anchorY);
+          ctx.lineTo(ballX, ballY);
+          ctx.lineTo(anchorX + 25, anchorY);
+          ctx.stroke();
+        }
+
+        // Slingshot Fork
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(anchorX, 360);
+        ctx.lineTo(anchorX, anchorY + 10);
+        ctx.lineTo(anchorX - 25, anchorY);
+        ctx.moveTo(anchorX, anchorY + 10);
+        ctx.lineTo(anchorX + 25, anchorY);
+        ctx.stroke();
+
+        // Ball Flying Physics
+        if (isFlying) {
+          ballX += ballVx;
+          ballY += ballVy;
+          ballVy += 0.22; // gravity
+
+          // Reached target apex / upper area
+          if (ballY <= 170 || ballVy > 3) {
+            isFlying = false;
+            evaluateZone(ballX, ballY);
+          }
+        }
+
+        // Render Ball
+        ctx.save();
+        ctx.fillStyle = '#6366f1';
+        ctx.shadowColor = '#818cf8';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(ballX, ballY, 20, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'black 14px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(getCurrentNumber(), ballX, ballY);
+        ctx.restore();
+
+        // Toast feedback
+        if (resultToast) {
+          resultToast.life -= 0.025;
+          ctx.fillStyle = resultToast.color;
+          ctx.font = 'bold 16px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(resultToast.text, 170, 235);
+          if (resultToast.life <= 0) resultToast = null;
+        }
+
+        CurrentGameLoop = requestAnimationFrame(updateAndRender);
+      }
+
+      function finishSetDrop() {
+        SoundEngine.playLevelUp();
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        AppState.addXP(score);
+
+        stage.innerHTML = `
+          <div class="text-center p-5 animate-in zoom-in-95">
+            <span class="text-5xl">🎯</span>
+            <h3 class="text-xl font-black text-slate-800 mt-2">Sapan Etabı Bitti!</h3>
+            <div class="mt-4 p-3 rounded-2xl bg-teal-50 border border-teal-200 font-extrabold text-teal-700 text-base">
+              +${score} XP Kazandın!
+            </div>
+            <div class="mt-4 flex items-center justify-center space-x-3">
+              <button onclick="initSetDrop()" class="px-5 py-2.5 rounded-full bg-teal-600 text-white font-bold text-xs shadow-md">
+                Tekrar Fırlat 🔄
+              </button>
+              <button onclick="closeGameArena()" class="px-5 py-2.5 rounded-full bg-slate-200 text-slate-700 font-bold text-xs">
+                Kapat
+              </button>
+            </div>
+          </div>
+        `;
+        footer.innerHTML = '';
+      }
+
+      CurrentGameLoop = requestAnimationFrame(updateAndRender);
+    }
+
+    /* -------------------------------------------------------------
+       OYUN 3: DENKLEM TERAZİSİ (PHYSICS BALANCE LAB)
+       ------------------------------------------------------------- */
+    function initScaleBalance() {
+      document.getElementById('arena-game-icon').textContent = '⚖️';
+      document.getElementById('arena-game-title').textContent = 'Denklem Terazisi (Fizik Lab)';
+
+      const stage = document.getElementById('game-stage');
+      const footer = document.getElementById('game-arena-footer');
+      stage.innerHTML = `<canvas id="balance-canvas" width="340" height="340" class="w-full max-w-[340px] h-[340px] rounded-2xl bg-slate-900 shadow-2xl mx-auto block"></canvas>`;
+
+      const canvas = document.getElementById('balance-canvas');
+      const ctx = canvas.getContext('2d');
+
+      let currentLevel = 0;
+      const levels = [
+        { target: '2x + 4 = 14', coeff: 2, c: 4, right: 14, solution: 5 },
+        { target: '3x - 6 = 15', coeff: 3, c: -6, right: 15, solution: 7 },
+        { target: '4x + 8 = 24', coeff: 4, c: 8, right: 24, solution: 4 }
+      ];
+
+      let coeff = 2;
+      let c = 4;
+      let right = 14;
+      let angle = 0.25; // tilted right
+      let targetAngle = 0.25;
+      let solved = false;
+      let particles = [];
+
+      function loadLevel() {
+        const lvl = levels[currentLevel];
+        coeff = lvl.coeff;
+        c = lvl.c;
+        right = lvl.right;
+        solved = false;
+        targetAngle = 0.22;
+        renderButtons();
+      }
+
+      function renderButtons() {
+        if (solved) {
+          footer.innerHTML = `
+            <button id="btn-next-scale" class="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold text-sm active:scale-95 shadow-md">
+              ${currentLevel + 1 < levels.length ? 'Sonraki Denklem Seviyesi ➡️' : 'Denge Zaferi! (+50 XP) 🏆'}
+            </button>
+          `;
+          document.getElementById('btn-next-scale').onclick = () => {
+            if (currentLevel + 1 < levels.length) {
+              currentLevel++;
+              loadLevel();
+            } else {
+              SoundEngine.playLevelUp();
+              AppState.addXP(50);
+              AppState.unlockBadge('balancer');
+              closeGameArena();
+            }
+          };
+          return;
+        }
+
+        footer.innerHTML = `
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <button id="btn-sub-const" class="py-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 font-bold active:scale-95">
+              🧲 Sabiti Yok Et (${c > 0 ? `-${c}` : `+${Math.abs(c)}`})
+            </button>
+            <button id="btn-div-coeff" class="py-2.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-800 font-bold active:scale-95">
+              ✂️ Katsayıya Böl (/${coeff})
+            </button>
+          </div>
+        `;
+
+        document.getElementById('btn-sub-const').onclick = () => {
+          if (c !== 0) {
+            SoundEngine.playLaser();
+            right -= c;
+            c = 0;
+            targetAngle = (right - (coeff * 5)) * 0.02;
+            checkBalance();
+          } else {
+            SoundEngine.playPop();
+          }
+        };
+
+        document.getElementById('btn-div-coeff').onclick = () => {
+          if (c === 0 && coeff > 1) {
+            SoundEngine.playSlice();
+            right = right / coeff;
+            coeff = 1;
+            checkBalance();
+          } else {
+            SoundEngine.playError();
+            showNotification('Önce sabiti sıfırlamalısın!');
+          }
+        };
+      }
+
+      function checkBalance() {
+        if (coeff === 1 && c === 0) {
+          solved = true;
+          targetAngle = 0;
+          SoundEngine.playSuccess();
+          confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+          renderButtons();
+        }
+      }
+
+      loadLevel();
+
+      function updateAndRender() {
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, 340, 340);
+
+        // Spring damping physics for balance tilt
+        angle += (targetAngle - angle) * 0.08;
+
+        // Header Equation
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 16px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${levels[currentLevel].target}`, 170, 30);
+
+        // Fulcrum Base
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(170, 140);
+        ctx.lineTo(170, 270);
+        ctx.stroke();
+
+        ctx.fillStyle = '#334155';
+        ctx.beginPath();
+        ctx.moveTo(140, 270);
+        ctx.lineTo(200, 270);
+        ctx.lineTo(170, 230);
+        ctx.closePath();
+        ctx.fill();
+
+        // Beam
+        ctx.save();
+        ctx.translate(170, 140);
+        ctx.rotate(angle);
+
+        ctx.strokeStyle = solved ? '#10b981' : '#f59e0b';
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.moveTo(-120, 0);
+        ctx.lineTo(120, 0);
+        ctx.stroke();
+
+        // Pivot center wheel
+        ctx.fillStyle = solved ? '#34d399' : '#d97706';
+        ctx.beginPath();
+        ctx.arc(0, 0, 10, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Left Pan suspension
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-110, 0);
+        ctx.lineTo(-135, 60);
+        ctx.moveTo(-110, 0);
+        ctx.lineTo(-85, 60);
+        ctx.stroke();
+
+        // Left Pan plate
+        ctx.fillStyle = '#475569';
+        ctx.beginPath();
+        ctx.ellipse(-110, 60, 40, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Left Pan Blocks
+        // x cubes
+        for (let i = 0; i < coeff; i++) {
+          ctx.fillStyle = '#38bdf8';
+          ctx.fillRect(-135 + i * 26, 35, 22, 22);
+          ctx.fillStyle = '#0f172a';
+          ctx.font = 'bold 12px sans-serif';
+          ctx.fillText('x', -124 + i * 26, 50);
+        }
+        // constant block
+        if (c !== 0) {
+          ctx.fillStyle = '#f59e0b';
+          ctx.fillRect(-85, 38, 22, 20);
+          ctx.fillStyle = '#000';
+          ctx.font = 'bold 10px sans-serif';
+          ctx.fillText(c > 0 ? `+${c}` : `${c}`, -74, 52);
+        }
+
+        // Right Pan suspension
+        ctx.strokeStyle = '#94a3b8';
+        ctx.beginPath();
+        ctx.moveTo(110, 0);
+        ctx.lineTo(85, 60);
+        ctx.moveTo(110, 0);
+        ctx.lineTo(135, 60);
+        ctx.stroke();
+
+        // Right Pan plate
+        ctx.fillStyle = '#475569';
+        ctx.beginPath();
+        ctx.ellipse(110, 60, 40, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Right Pan weight
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillRect(95, 30, 30, 28);
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(`${right}`, 110, 48);
+
+        ctx.restore();
+
+        // Dial Needle at center top
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(130, 50, 80, 24);
+        ctx.strokeStyle = solved ? '#10b981' : '#f43f5e';
+        ctx.strokeRect(130, 50, 80, 24);
+
+        ctx.fillStyle = solved ? '#10b981' : '#e2e8f0';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText(solved ? 'DENGE! ✓' : 'DENGESİZ', 170, 66);
+
+        CurrentGameLoop = requestAnimationFrame(updateAndRender);
+      }
+
+      CurrentGameLoop = requestAnimationFrame(updateAndRender);
+    }
+
+    /* -------------------------------------------------------------
+       OYUN 4: MUTLAK DEĞER LAZER SAVUNMASI (LASER SPACE DEFENDER)
+       ------------------------------------------------------------- */
+    function initLaserShield() {
+      document.getElementById('arena-game-icon').textContent = '🛡️';
+      document.getElementById('arena-game-title').textContent = 'Mutlak Değer Lazer Savunması';
+
+      const stage = document.getElementById('game-stage');
+      const footer = document.getElementById('game-arena-footer');
+      stage.innerHTML = `<canvas id="laser-canvas" width="340" height="380" class="w-full max-w-[340px] h-[380px] rounded-2xl bg-slate-950 shadow-2xl touch-none mx-auto block"></canvas>`;
+      footer.innerHTML = `
+        <div class="text-center text-xs text-slate-400">
+          Ekrana <b>dokunarak lazerle vur</b>! Tehlikeli meteorları patlat, dost kristalleri koru! ⚡
+        </div>
+      `;
+
+      const canvas = document.getElementById('laser-canvas');
+      const ctx = canvas.getContext('2d');
+
+      const maxSafe = 4; // |x| <= 4 is safe
+      let score = 0;
+      let shieldHp = 100;
+      let timeLeft = 25;
+      let meteors = [];
+      let lasers = [];
+      let particles = [];
+
+      function spawnMeteor() {
+        const isSafe = Math.random() > 0.55;
+        let val;
+        if (isSafe) {
+          val = Math.floor(Math.random() * (maxSafe * 2 + 1)) - maxSafe; // -4 to +4
+        } else {
+          val = (Math.random() > 0.5 ? 1 : -1) * (maxSafe + 1 + Math.floor(Math.random() * 6)); // >= 5 or <= -5
+        }
+
+        meteors.push({
+          x: 40 + Math.random() * 260,
+          y: -25,
+          vx: (Math.random() - 0.5) * 1.2,
+          vy: 1.2 + Math.random() * 1.5,
+          val,
+          isSafe: Math.abs(val) <= maxSafe,
+          radius: 18
+        });
+      }
+
+      function handleShoot(e) {
+        e.preventDefault();
+        const pos = getCanvasCoords(canvas, e);
+        SoundEngine.playLaser();
+
+        // Spawn laser beam from base (170, 350) to touch point
+        lasers.push({
+          x: 170,
+          y: 340,
+          targetX: pos.x,
+          targetY: pos.y,
+          progress: 0
+        });
+
+        // Check instant hit on meteors near tap
+        meteors.forEach((m, idx) => {
+          const dist = Math.hypot(m.x - pos.x, m.y - pos.y);
+          if (dist < m.radius + 15) {
+            // Hit!
+            if (!m.isSafe) {
+              // Destroyed dangerous meteor
+              SoundEngine.playExplosion();
+              score += 25;
+              spawnSparks(m.x, m.y, '#ef4444');
+              meteors.splice(idx, 1);
+            } else {
+              // Destroyed safe crystal (penalty)
+              SoundEngine.playError();
+              spawnSparks(m.x, m.y, '#38bdf8');
+              meteors.splice(idx, 1);
+            }
+          }
+        });
+      }
+
+      canvas.addEventListener('touchstart', handleShoot, { passive: false });
+      canvas.addEventListener('mousedown', handleShoot);
+
+      function spawnSparks(x, y, color) {
+        for (let i = 0; i < 18; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const spd = 2 + Math.random() * 4;
+          particles.push({
+            x, y,
+            vx: Math.cos(angle) * spd,
+            vy: Math.sin(angle) * spd,
+            color,
+            life: 1
+          });
+        }
+      }
+
+      let spawnTimer = setInterval(spawnMeteor, 1100);
+      let gameTimer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(spawnTimer);
+          clearInterval(gameTimer);
+          cancelAnimationFrame(CurrentGameLoop);
+          finishLaserGame(true);
+        }
+      }, 1000);
+      GameIntervals.push(spawnTimer, gameTimer);
+
+      function updateAndRender() {
+        ctx.fillStyle = '#020617';
+        ctx.fillRect(0, 0, 340, 380);
+
+        // Header HUD
+        ctx.fillStyle = 'rgba(255,255,255,0.06)';
+        ctx.fillRect(8, 6, 324, 30);
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 12px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(`KALKAN KURALI: |x| ≤ ${maxSafe}`, 170, 24);
+
+        // Base Turret at (170, 350)
+        ctx.fillStyle = shieldHp > 40 ? '#6366f1' : '#ef4444';
+        ctx.beginPath();
+        ctx.arc(170, 355, 30, Math.PI, 0);
+        ctx.fill();
+
+        // Shield Energy Ring
+        ctx.strokeStyle = shieldHp > 40 ? 'rgba(99, 102, 241, 0.4)' : 'rgba(239, 68, 68, 0.5)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(170, 355, 42, Math.PI, 0);
+        ctx.stroke();
+
+        // Shield HP bar
+        ctx.fillStyle = '#334155';
+        ctx.fillRect(110, 368, 120, 6);
+        ctx.fillStyle = shieldHp > 40 ? '#10b981' : '#ef4444';
+        ctx.fillRect(110, 368, (shieldHp / 100) * 120, 6);
+
+        // Render Lasers
+        lasers.forEach((l, idx) => {
+          l.progress += 0.2;
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(170, 340);
+          ctx.lineTo(l.targetX, l.targetY);
+          ctx.stroke();
+          if (l.progress >= 1) lasers.splice(idx, 1);
+        });
+
+        // Update Meteors
+        meteors.forEach((m, idx) => {
+          m.x += m.vx;
+          m.y += m.vy;
+
+          // Render meteor
+          ctx.save();
+          ctx.fillStyle = m.isSafe ? '#38bdf8' : '#ef4444';
+          ctx.shadowColor = m.isSafe ? '#38bdf8' : '#ef4444';
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'black 12px monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(m.val, m.x, m.y);
+          ctx.restore();
+
+          // Check hit on base
+          if (m.y >= 335) {
+            if (m.isSafe) {
+              // Absorbed safe crystal!
+              SoundEngine.playSuccess();
+              score += 15;
+              shieldHp = Math.min(100, shieldHp + 10);
+            } else {
+              // Hit by dangerous meteor!
+              SoundEngine.playExplosion();
+              shieldHp -= 25;
+              canvas.classList.add('shake-target');
+              setTimeout(() => canvas.classList.remove('shake-target'), 350);
+            }
+            meteors.splice(idx, 1);
+
+            if (shieldHp <= 0) {
+              clearInterval(spawnTimer);
+              clearInterval(gameTimer);
+              cancelAnimationFrame(CurrentGameLoop);
+              finishLaserGame(false);
+              return;
+            }
+          }
+        });
+
+        // Update Sparks
+        particles.forEach((p, idx) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.life -= 0.04;
+          if (p.life <= 0) {
+            particles.splice(idx, 1);
+          } else {
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+
+        CurrentGameLoop = requestAnimationFrame(updateAndRender);
+      }
+
+      function finishLaserGame(won) {
+        if (won) {
+          SoundEngine.playLevelUp();
+          confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+          AppState.addXP(score + 40);
+        }
+        stage.innerHTML = `
+          <div class="text-center p-5 animate-in zoom-in-95">
+            <span class="text-5xl">${won ? '🛡️✨' : '💥'}</span>
+            <h3 class="text-xl font-black text-slate-800 mt-2">${won ? 'Savunma Zaferi!' : 'Kalkan Düştü!'}</h3>
+            <div class="mt-4 p-3 rounded-2xl bg-indigo-50 border border-indigo-200 font-extrabold text-indigo-700 text-base">
+              ${won ? `+${score + 40} XP Kazandın!` : `Skor: ${score}`}
+            </div>
+            <div class="mt-4 flex items-center justify-center space-x-3">
+              <button onclick="initLaserShield()" class="px-5 py-2.5 rounded-full bg-indigo-600 text-white font-bold text-xs shadow-md">
+                Tekrar Savun 🔄
+              </button>
+              <button onclick="closeGameArena()" class="px-5 py-2.5 rounded-full bg-slate-200 text-slate-700 font-bold text-xs">
+                Kapat
+              </button>
+            </div>
+          </div>
+        `;
+        footer.innerHTML = '';
+      }
+
+      CurrentGameLoop = requestAnimationFrame(updateAndRender);
+    }
+
+    /* -------------------------------------------------------------
+       OYUN 5: ORAN ROKETİ (ROCKET TUNNEL FLIGHT - FLAPPY THRUST)
+       ------------------------------------------------------------- */
+    function initRatioRocket() {
+      document.getElementById('arena-game-icon').textContent = '🚀';
+      document.getElementById('arena-game-title').textContent = 'Oran Roketi (Tünel Uçuşu)';
+
+      const stage = document.getElementById('game-stage');
+      const footer = document.getElementById('game-arena-footer');
+      stage.innerHTML = `<canvas id="rocket-canvas" width="340" height="380" class="w-full max-w-[340px] h-[380px] rounded-2xl bg-slate-950 shadow-2xl touch-none mx-auto block"></canvas>`;
+      footer.innerHTML = `
+        <div class="text-center text-xs text-slate-400">
+          Ekrana <b>basılı tutarak roketi yükselt</b>! Doğru kapıdan uçur. 🚀
+        </div>
+      `;
+
+      const canvas = document.getElementById('rocket-canvas');
+      const ctx = canvas.getContext('2d');
+
+      const questions = [
+        { q: '4 işçi 12 günde yaparsa, 6 işçi kaç günde?', correct: '8 Gün', wrong: '18 Gün' },
+        { q: '3 kg elma 60 TL ise, 7 kg elma kaç TL?', correct: '140 TL', wrong: '120 TL' },
+        { q: '60 km/s ile 4 saatte gidilen yol, 80 km/s ile kaç saatte?', correct: '3 Saat', wrong: '5 Saat' },
+        { q: 'Kız/Erkek oranı 3/5. 15 erkek varsa kaç kız vardır?', correct: '9 Kız', wrong: '12 Kız' }
+      ];
+
+      let qIndex = 0;
+      let rocketY = 190;
+      let rocketVy = 0;
+      let isThrusting = false;
+      let fuel = 0;
+      let gateX = 350;
+      let topGateIsCorrect = true;
+
+      function setupNextGate() {
+        gateX = 350;
+        topGateIsCorrect = Math.random() > 0.5;
+      }
+      setupNextGate();
+
+      function handleThrustStart(e) {
+        e.preventDefault();
+        isThrusting = true;
+        SoundEngine.playThrust();
+      }
+      function handleThrustEnd() {
+        isThrusting = false;
+      }
+
+      canvas.addEventListener('touchstart', handleThrustStart, { passive: false });
+      canvas.addEventListener('touchend', handleThrustEnd);
+      canvas.addEventListener('mousedown', handleThrustStart);
+      window.addEventListener('mouseup', handleThrustEnd);
+
+      function updateAndRender() {
+        ctx.fillStyle = '#020617';
+        ctx.fillRect(0, 0, 340, 380);
+
+        // Rocket Physics
+        if (isThrusting) {
+          rocketVy -= 0.65;
+        } else {
+          rocketVy += 0.35; // gravity
+        }
+        rocketVy = Math.max(-5, Math.min(5, rocketVy));
+        rocketY += rocketVy;
+        rocketY = Math.max(50, Math.min(350, rocketY));
+
+        // Question HUD
+        const curQ = questions[qIndex % questions.length];
+        ctx.fillStyle = 'rgba(255,255,255,0.06)';
+        ctx.fillRect(8, 6, 324, 34);
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(curQ.q, 170, 26);
+
+        // Gates Movement
+        gateX -= 3.2;
+
+        // Draw Top Gate (y: 60 - 180)
+        const topText = topGateIsCorrect ? curQ.correct : curQ.wrong;
+        const bottomText = topGateIsCorrect ? curQ.wrong : curQ.correct;
+
+        ctx.fillStyle = topGateIsCorrect ? 'rgba(16, 185, 129, 0.25)' : 'rgba(239, 68, 68, 0.25)';
+        ctx.strokeStyle = topGateIsCorrect ? '#10b981' : '#ef4444';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(gateX, 60, 65, 110);
+        ctx.fillRect(gateX, 60, 65, 110);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(topText, gateX + 32, 120);
+
+        // Draw Bottom Gate (y: 220 - 340)
+        ctx.fillStyle = !topGateIsCorrect ? 'rgba(16, 185, 129, 0.25)' : 'rgba(239, 68, 68, 0.25)';
+        ctx.strokeStyle = !topGateIsCorrect ? '#10b981' : '#ef4444';
+        ctx.strokeRect(gateX, 220, 65, 110);
+        ctx.fillRect(gateX, 220, 65, 110);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(bottomText, gateX + 32, 280);
+
+        // Draw Rocket
+        ctx.save();
+        ctx.translate(80, rocketY);
+        ctx.rotate(rocketVy * 0.08);
+
+        // Flame
+        if (isThrusting) {
+          ctx.fillStyle = '#f59e0b';
+          ctx.beginPath();
+          ctx.moveTo(-16, 0);
+          ctx.lineTo(-28 + Math.random() * 4, -4);
+          ctx.lineTo(-28 + Math.random() * 4, 4);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        // Rocket body
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath();
+        ctx.moveTo(18, 0);
+        ctx.lineTo(-14, -9);
+        ctx.lineTo(-10, 0);
+        ctx.lineTo(-14, 9);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(2, 0, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Collision Check with gate
+        if (gateX <= 95 && gateX >= 60) {
+          const inTopGate = rocketY >= 60 && rocketY <= 170;
+          const inBottomGate = rocketY >= 220 && rocketY <= 330;
+
+          if ((topGateIsCorrect && inTopGate) || (!topGateIsCorrect && inBottomGate)) {
+            // Passed correct gate!
+            SoundEngine.playSuccess();
+            fuel += 25;
+            qIndex++;
+            if (fuel >= 100) {
+              cancelAnimationFrame(CurrentGameLoop);
+              finishRatioRocket();
+              return;
+            } else {
+              setupNextGate();
+            }
+          } else if ((!topGateIsCorrect && inTopGate) || (topGateIsCorrect && inBottomGate)) {
+            // Hit wrong gate!
+            SoundEngine.playError();
+            canvas.classList.add('shake-target');
+            setTimeout(() => canvas.classList.remove('shake-target'), 350);
+            setupNextGate();
+          }
+        }
+
+        if (gateX < -70) {
+          setupNextGate();
+        }
+
+        CurrentGameLoop = requestAnimationFrame(updateAndRender);
+      }
+
+      function finishRatioRocket() {
+        SoundEngine.playLevelUp();
+        confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
+        AppState.addXP(60);
+        AppState.unlockBadge('rocket_pilot');
+
+        stage.innerHTML = `
+          <div class="text-center p-5 animate-in zoom-in-95">
+            <span class="text-6xl animate-bounce-soft block mb-2">🚀✨</span>
+            <h3 class="text-xl font-black text-slate-800">Yörüngeye Ulaştın!</h3>
+            <p class="text-xs text-slate-500 mt-1">Oran roketini tüm engellerden başarıyla uçurdun.</p>
+            <div class="mt-4 p-3 rounded-2xl bg-rose-50 border border-rose-200 font-extrabold text-rose-700 text-base">
+              +60 XP Kazandın!
+            </div>
+            <div class="mt-4 flex items-center justify-center space-x-3">
+              <button onclick="initRatioRocket()" class="px-5 py-2.5 rounded-full bg-rose-600 text-white font-bold text-xs shadow-md">
+                Tekrar Uçur 🔄
+              </button>
+              <button onclick="closeGameArena()" class="px-5 py-2.5 rounded-full bg-slate-200 text-slate-700 font-bold text-xs">
+                Kapat
+              </button>
+            </div>
+          </div>
+        `;
+        footer.innerHTML = '';
+      }
+
+      CurrentGameLoop = requestAnimationFrame(updateAndRender);
+    }
+
+    /* -------------------------------------------------------------
+       OYUN 6: BÖLÜNEBİLME BOMBASI (FRUIT SLICE / BUBBLE BURST RUSH)
+       ------------------------------------------------------------- */
+    function initBombRush() {
+      document.getElementById('arena-game-icon').textContent = '💣';
+      document.getElementById('arena-game-title').textContent = 'Bölünebilme Bombası (Fruit Slice)';
+
+      const stage = document.getElementById('game-stage');
+      const footer = document.getElementById('game-arena-footer');
+      stage.innerHTML = `<canvas id="bomb-canvas" width="340" height="380" class="w-full max-w-[340px] h-[380px] rounded-2xl bg-slate-950 shadow-2xl touch-none mx-auto block"></canvas>`;
+      footer.innerHTML = `
+        <div class="text-center text-xs text-slate-400">
+          Parmağını kaydırarak <b>3'e bölünenleri havada KES</b>! 🍉⚔️
+        </div>
+      `;
+
+      const canvas = document.getElementById('bomb-canvas');
+      const ctx = canvas.getContext('2d');
+
+      let timeLeft = 22;
+      let meter = 0;
+      let bubbles = [];
+      let bladeTrail = [];
+      let isSlicing = false;
+
+      const numOptions = [123, 44, 96, 50, 75, 270, 31, 84, 99, 41, 105, 52, 18, 303, 62];
+
+      function spawnBubble() {
+        const val = numOptions[Math.floor(Math.random() * numOptions.length)];
+        bubbles.push({
+          x: 50 + Math.random() * 240,
+          y: 390,
+          vx: (Math.random() - 0.5) * 3,
+          vy: -(8.5 + Math.random() * 3.5),
+          val,
+          isMatch: val % 3 === 0,
+          radius: 22,
+          sliced: false,
+          half1X: 0,
+          half2X: 0
+        });
+      }
+
+      function onTouchStart(e) {
+        isSlicing = true;
+        const pos = getCanvasCoords(canvas, e);
+        bladeTrail = [pos];
+      }
+
+      function onTouchMove(e) {
+        if (!isSlicing) return;
+        e.preventDefault();
+        const pos = getCanvasCoords(canvas, e);
+        bladeTrail.push(pos);
+        if (bladeTrail.length > 8) bladeTrail.shift();
+
+        // Check intersection with bubbles
+        bubbles.forEach((b) => {
+          if (!b.sliced) {
+            const dist = Math.hypot(b.x - pos.x, b.y - pos.y);
+            if (dist < b.radius + 10) {
+              b.sliced = true;
+              SoundEngine.playSlice();
+
+              if (b.isMatch) {
+                // Correct slice!
+                meter = Math.min(100, meter + 12);
+                if (meter >= 100) {
+                  clearInterval(spawnTimer);
+                  clearInterval(gameTimer);
+                  cancelAnimationFrame(CurrentGameLoop);
+                  finishBombRush(true);
+                }
+              } else {
+                // Wrong slice! Penalty
+                SoundEngine.playError();
+                timeLeft = Math.max(0, timeLeft - 2.5);
+                canvas.classList.add('shake-target');
+                setTimeout(() => canvas.classList.remove('shake-target'), 350);
+              }
+            }
+          }
+        });
+      }
+
+      function onTouchEnd() {
+        isSlicing = false;
+        bladeTrail = [];
+      }
+
+      canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+      canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+      canvas.addEventListener('touchend', onTouchEnd);
+
+      canvas.addEventListener('mousedown', onTouchStart);
+      window.addEventListener('mousemove', onTouchMove);
+      window.addEventListener('mouseup', onTouchEnd);
+
+      let spawnTimer = setInterval(spawnBubble, 850);
+      let gameTimer = setInterval(() => {
+        timeLeft -= 1;
+        if (timeLeft <= 0) {
+          clearInterval(spawnTimer);
+          clearInterval(gameTimer);
+          cancelAnimationFrame(CurrentGameLoop);
+          finishBombRush(false);
+        }
+      }, 1000);
+      GameIntervals.push(spawnTimer, gameTimer);
+
+      function updateAndRender() {
+        ctx.fillStyle = '#020617';
+        ctx.fillRect(0, 0, 340, 380);
+
+        // Header Bomb HUD
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+        ctx.fillRect(8, 6, 324, 34);
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(8, 6, 324, 34);
+
+        ctx.fillStyle = '#ef4444';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(`💣 SÜRE: ${Math.max(0, timeLeft)}s`, 18, 26);
+
+        ctx.fillStyle = '#10b981';
+        ctx.textAlign = 'right';
+        ctx.fillText(`İMHA: %${meter}`, 320, 26);
+
+        // Mission rule text
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText("HEDEF: 3'E BÖLÜNENLERİ KES (Rakamlar toplamı 3'ün katı)", 170, 56);
+
+        // Update & Render Bubbles
+        bubbles.forEach((b, idx) => {
+          b.x += b.vx;
+          b.y += b.vy;
+          b.vy += 0.22; // gravity
+
+          if (b.sliced) {
+            b.half1X -= 2;
+            b.half2X += 2;
+          }
+
+          ctx.save();
+          if (!b.sliced) {
+            ctx.fillStyle = b.isMatch ? '#38bdf8' : '#f59e0b';
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'black 13px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(b.val, b.x, b.y);
+          } else {
+            // Sliced halves flying apart
+            ctx.fillStyle = b.isMatch ? '#10b981' : '#ef4444';
+            ctx.beginPath();
+            ctx.arc(b.x + b.half1X, b.y, b.radius * 0.8, 0, Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(b.x + b.half2X, b.y, b.radius * 0.8, Math.PI, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+
+          if (b.y > 410) bubbles.splice(idx, 1);
+        });
+
+        // Render Blade Trail
+        if (bladeTrail.length > 1) {
+          ctx.save();
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 4;
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.moveTo(bladeTrail[0].x, bladeTrail[0].y);
+          for (let i = 1; i < bladeTrail.length; i++) {
+            ctx.lineTo(bladeTrail[i].x, bladeTrail[i].y);
+          }
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        CurrentGameLoop = requestAnimationFrame(updateAndRender);
+      }
+
+      function finishBombRush(won) {
+        if (won) {
+          SoundEngine.playLevelUp();
+          confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+          AppState.addXP(50);
+          AppState.unlockBadge('bomb_defuser');
+        } else {
+          SoundEngine.playExplosion();
+        }
+        stage.innerHTML = `
+          <div class="text-center p-5 animate-in zoom-in-95">
+            <span class="text-5xl">${won ? '🛡️✨' : '💥'}</span>
+            <h3 class="text-xl font-black text-slate-800 mt-2">${won ? 'Bomba İmha Edildi!' : 'Bomba Patladı!'}</h3>
+            <div class="mt-4 p-3 rounded-2xl bg-indigo-50 border border-indigo-200 font-extrabold text-indigo-700 text-base">
+              ${won ? '+50 XP Kazandın!' : 'Zaman doldu, tekrar dene!'}
+            </div>
+            <div class="mt-4 flex items-center justify-center space-x-3">
+              <button onclick="initBombRush()" class="px-5 py-2.5 rounded-full bg-indigo-600 text-white font-bold text-xs shadow-md">
+                Tekrar Dene 🔄
+              </button>
+              <button onclick="closeGameArena()" class="px-5 py-2.5 rounded-full bg-slate-200 text-slate-700 font-bold text-xs">
+                Kapat
+              </button>
+            </div>
+          </div>
+        `;
+        footer.innerHTML = '';
+      }
+
+      CurrentGameLoop = requestAnimationFrame(updateAndRender);
+    }
+
+    /* ==============================================================
+       6. TINDER TARZI FORMÜL KARTLARI (SWIPE FLASHCARDS VIEW)
+       ============================================================== */
+    const FLASHCARDS = [
+      {
+        id: 'fc1',
+        topic: 'Mantık',
+        front: "De Morgan Kuralı nedir?",
+        back: "(p ∧ q)' ≡ p' ∨ q'\n(p ∨ q)' ≡ p' ∧ q'\nDeğil içeri dağıtılırken bağlaç tersine döner!",
+        icon: '⚡'
+      },
+      {
+        id: 'fc2',
+        topic: 'Mantık',
+        front: "Koşullu Önerme (p ⇒ q) açılımı nedir?",
+        back: "p ⇒ q ≡ p' ∨ q\n(Yalnızca 1 ⇒ 0 durumunda sonuç 0 olur, diğerlerinde 1'dir!)",
+        icon: '➡️'
+      },
+      {
+        id: 'fc3',
+        topic: 'Mantık',
+        front: "p ⇒ q önermesinin Karşıt Tersi nedir?",
+        back: "q' ⇒ p'\n(Bir önerme ile karşıt tersinin doğruluk değerleri daima birbirine denktir!)",
+        icon: '🔄'
+      },
+      {
+        id: 'fc4',
+        topic: 'Kümeler',
+        front: "n elemanlı kümenin alt küme ve öz alt küme sayısı?",
+        back: "Alt küme sayısı: 2ⁿ\nÖz alt küme sayısı: 2ⁿ - 1 (Kümenin kendisi hariç)",
+        icon: '🎯'
+      },
+      {
+        id: 'fc5',
+        topic: 'Kümeler',
+        front: "İki kümenin birleşim eleman sayısı formülü?",
+        back: "s(A ∪ B) = s(A) + s(B) - s(A ∩ B)\n(Kesişim iki kez sayılmamak için bir kez çıkartılır!)",
+        icon: '🔵'
+      },
+      {
+        id: 'fc6',
+        topic: 'Denklemler',
+        front: "|x| ≤ a (a > 0) eşitsizliğinin çözümü?",
+        back: "-a ≤ x ≤ a\n(Mutlak değer belirli bir sayıdan küçükse sayı doğrusunda o aralıkta sıkışır)",
+        icon: '📏'
+      },
+      {
+        id: 'fc7',
+        topic: 'Denklemler',
+        front: "|x| ≥ a (a > 0) eşitsizliğinin çözümü?",
+        back: "x ≥ a veya x ≤ -a\n(Dış kanatlara doğru genişler!)",
+        icon: '↔️'
+      },
+      {
+        id: 'fc8',
+        topic: 'Bölünebilme',
+        front: "3 ve 9 ile Bölünebilme Kuralı?",
+        back: "Sayının rakamları toplamı 3'ün katıysa 3'e, 9'un katıysa 9'a tam bölünür!",
+        icon: '➗'
+      },
+      {
+        id: 'fc9',
+        topic: 'Bölünebilme',
+        front: "4 ile Bölünebilme Kuralı?",
+        back: "Sayının son iki basamağı 00 veya 4'ün katı olmalıdır (Örn: 524, 700).",
+        icon: '🔢'
+      },
+      {
+        id: 'fc10',
+        topic: 'Oran & Orantı',
+        front: "Doğru ve Ters Orantı Farkı?",
+        back: "Doğru Orantı: y/x = k (Biri artarken diğeri de artar)\nTers Orantı: x · y = k (Biri artarken diğeri azalır, işçi/hız)",
+        icon: '⚖️'
+      },
+      {
+        id: 'fc11',
+        topic: 'Gerçek Sayılar',
+        front: "İki Kare Farkı Özdeşliği?",
+        back: "a² - b² = (a - b)(a + b)",
+        icon: '📐'
+      },
+      {
+        id: 'fc12',
+        topic: 'Kümeler',
+        front: "A \\ B (A Fark B) Kümesi Nedir?",
+        back: "A'da olup B'de olmayan elemanların kümesidir: A \\ B = A ∩ B'",
+        icon: '✂️'
+      }
+    ];
+
+    let currentCardIndex = 0;
+    let isFlipped = false;
+
+    function initFlashcardsView() {
+      currentCardIndex = 0;
+      isFlipped = false;
+      renderActiveCard();
+      updateFlashcardStats();
+    }
+
+    function renderActiveCard() {
+      const container = document.getElementById('flashcard-container');
+      const counter = document.getElementById('flashcard-counter');
+      if (!container) return;
+
+      if (currentCardIndex >= FLASHCARDS.length) {
+        container.innerHTML = `
+          <div class="glass-card rounded-3xl p-6 text-center h-full flex flex-col items-center justify-center border-2 border-emerald-300">
+            <span class="text-5xl animate-bounce-soft">🎉</span>
+            <h3 class="text-lg font-black text-slate-800 mt-2">Tüm Kartları İnceledin!</h3>
+            <p class="text-xs text-slate-500 mt-1">Harika bir hafıza antrenmanı oldu.</p>
+            <button onclick="initFlashcardsView()" class="mt-4 px-6 py-2.5 rounded-full bg-indigo-600 text-white font-bold text-xs shadow-md">
+              Tekrar Başlat 🔄
+            </button>
+          </div>
+        `;
+        counter.textContent = `${FLASHCARDS.length} / ${FLASHCARDS.length}`;
+        return;
+      }
+
+      const card = FLASHCARDS[currentCardIndex];
+      counter.textContent = `${currentCardIndex + 1} / ${FLASHCARDS.length}`;
+
+      container.innerHTML = `
+        <div id="active-card-element" class="w-full h-full glass-card rounded-3xl p-6 flex flex-col justify-between border-2 border-white/80 shadow-xl cursor-pointer card-swipe-transition select-none">
+          
+          <!-- Card Top Bar -->
+          <div class="flex items-center justify-between">
+            <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-[10px] font-extrabold uppercase tracking-wider">
+              ${card.topic}
+            </span>
+            <span class="text-xl">${card.icon}</span>
+          </div>
+
+          <!-- Card Body (Front / Back toggle) -->
+          <div class="my-auto text-center py-4">
+            <span class="text-[10px] font-bold text-slate-400 block mb-1">
+              ${isFlipped ? '💡 CEVAP & KURAL' : '❓ SORU & KAVRAM'}
+            </span>
+            <h3 class="font-extrabold text-slate-800 ${isFlipped ? 'text-sm font-mono whitespace-pre-line text-indigo-900 leading-relaxed' : 'text-lg leading-snug'}">
+              ${isFlipped ? card.back : card.front}
+            </h3>
+          </div>
+
+          <!-- Card Bottom Hint -->
+          <div class="text-center pt-2 border-t border-slate-100 flex items-center justify-center space-x-1 text-slate-400 text-[11px]">
+            <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+            <span>Dokunarak çevir</span>
+          </div>
+
+        </div>
+      `;
+
+      lucide.createIcons();
+
+      const cardEl = document.getElementById('active-card-element');
+      
+      // Touch / Mouse Drag Physics (Tinder style)
+      let startX = 0;
+      let currentX = 0;
+      let isDragging = false;
+
+      function onTouchStart(e) {
+        startX = (e.touches ? e.touches[0].clientX : e.clientX);
+        isDragging = true;
+        cardEl.style.transition = 'none';
+      }
+
+      function onTouchMove(e) {
+        if (!isDragging) return;
+        currentX = (e.touches ? e.touches[0].clientX : e.clientX);
+        const diffX = currentX - startX;
+        const rotateDeg = diffX * 0.08;
+        cardEl.style.transform = `translateX(${diffX}px) rotate(${rotateDeg}deg)`;
+        cardEl.style.opacity = Math.max(0.4, 1 - Math.abs(diffX) / 400);
+      }
+
+      function onTouchEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+        const diffX = currentX - startX;
+        cardEl.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease';
+
+        if (diffX > 80) {
+          swipeCard('right');
+        } else if (diffX < -80) {
+          swipeCard('left');
+        } else {
+          // Snap back
+          cardEl.style.transform = 'translateX(0px) rotate(0deg)';
+          cardEl.style.opacity = '1';
+        }
+      }
+
+      cardEl.addEventListener('touchstart', onTouchStart, { passive: true });
+      cardEl.addEventListener('touchmove', onTouchMove, { passive: true });
+      cardEl.addEventListener('touchend', onTouchEnd);
+
+      cardEl.addEventListener('mousedown', onTouchStart);
+      window.addEventListener('mousemove', onTouchMove);
+      window.addEventListener('mouseup', onTouchEnd);
+
+      // Tap / click to flip (only if not dragged)
+      cardEl.onclick = (e) => {
+        if (Math.abs(currentX - startX) > 10) return; // was drag
+        SoundEngine.playPop();
+        isFlipped = !isFlipped;
+        renderActiveCard();
+      };
+    }
+
+    function swipeCard(direction) {
+      const cardEl = document.getElementById('active-card-element');
+      if (!cardEl) return;
+
+      if (direction === 'right') {
+        SoundEngine.playSuccess();
+        cardEl.style.transform = 'translateX(280px) rotate(22deg)';
+        cardEl.style.opacity = '0';
+        AppState.addXP(15);
+        if (!AppState.learnedCards.includes(FLASHCARDS[currentCardIndex].id)) {
+          AppState.learnedCards.push(FLASHCARDS[currentCardIndex].id);
+          if (AppState.learnedCards.length >= 10) {
+            AppState.unlockBadge('card_scholar');
+          }
+          AppState.save();
+        }
+      } else {
+        SoundEngine.playPop();
+        cardEl.style.transform = 'translateX(-280px) rotate(-22deg)';
+        cardEl.style.opacity = '0';
+      }
+
+      setTimeout(() => {
+        currentCardIndex++;
+        isFlipped = false;
+        renderActiveCard();
+        updateFlashcardStats();
+      }, 260);
+    }
+
+    function updateFlashcardStats() {
+      const learnedCount = AppState.learnedCards.length;
+      document.getElementById('stat-learned-cards').textContent = learnedCount;
+      document.getElementById('stat-remaining-cards').textContent = Math.max(0, FLASHCARDS.length - learnedCount);
+      document.getElementById('stat-cards-xp').textContent = learnedCount * 15;
+    }
+
+    /* Bind Flashcard controls */
+    document.getElementById('card-swipe-right-btn')?.addEventListener('click', () => swipeCard('right'));
+    document.getElementById('card-swipe-left-btn')?.addEventListener('click', () => swipeCard('left'));
+    document.getElementById('card-flip-btn')?.addEventListener('click', () => {
+      SoundEngine.playPop();
+      isFlipped = !isFlipped;
+      renderActiveCard();
+    });
+
+    /* ==============================================================
+       7. INITIALIZATION & GLOBAL BINDINGS
+       ============================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      // 1. Initialize State
+      AppState.load();
+
+      // 2. Initialize UI Tabs
+      initTabs();
+
+      // 3. Lucide Icons
+      lucide.createIcons();
+
+      // 4. Sound Toggle
+      document.getElementById('sound-toggle-btn').addEventListener('click', () => {
+        SoundEngine.toggle();
+      });
+
+      // 5. Placement Test trigger buttons
+      document.getElementById('start-placement-btn').addEventListener('click', () => {
+        SoundEngine.playPop();
+        PlacementEngine.start();
+      });
+
+      document.getElementById('retest-btn').addEventListener('click', () => {
+        SoundEngine.playPop();
+        PlacementEngine.start();
+      });
+
+      // 6. Reset progress button
+      document.getElementById('reset-progress-btn').addEventListener('click', () => {
+        if (confirm('Tüm XP ve seviye ilerlemen sıfırlansın mı?')) {
+          AppState.reset();
+        }
+      });
+
+      // 7. PWA Service Worker Registration
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(() => {
+          // SW registered or offline cache
+        });
+      }
+    });
+  </script>
+</body>
+</html>

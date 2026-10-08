@@ -1,0 +1,22 @@
+{
+  "name": "MatArcade - 9. Sınıf Maarif Modeli",
+  "short_name": "MatArcade",
+  "description": "9. Sınıf Maarif Modeli Matematik Oyunlaştırılmış Öğrenme ve Arcade Platformu",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#f8fafc",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
